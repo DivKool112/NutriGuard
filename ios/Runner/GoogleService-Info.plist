@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>440095632168-4ndqijjv4ic6ct8rbgi6o7hkd6no13pi.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.440095632168-4ndqijjv4ic6ct8rbgi6o7hkd6no13pi</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>440095632168-i1pbn82s682lsfmpbgl7jenb8kjg88vm.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCNrnbo6lxEWr51kOkqMozPqOr7FONBUfY</string>
+	<key>GCM_SENDER_ID</key>
+	<string>440095632168</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.nurtiGuard</string>
+	<key>PROJECT_ID</key>
+	<string>nurtiguard</string>
+	<key>STORAGE_BUCKET</key>
+	<string>nurtiguard.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:440095632168:ios:758585994fc68b7a7fbe1d</string>
+</dict>
+</plist>

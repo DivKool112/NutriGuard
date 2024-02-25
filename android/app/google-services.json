@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "440095632168",
+    "project_id": "nurtiguard",
+    "storage_bucket": "nurtiguard.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:440095632168:android:f264b2411553bbeb7fbe1d",
+        "android_client_info": {
+          "package_name": "com.example.nurti_guard"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "440095632168-i1pbn82s682lsfmpbgl7jenb8kjg88vm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.nurti_guard",
+            "certificate_hash": "8159260cd1ea418a8f667eee5dd90201c76c7f01"
+          }
+        },
+        {
+          "client_id": "440095632168-l1b1aoffad4ed6n8vnluo5u2e0asc4ni.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5grxYf10Vv20UufQroo9DZ-YFJRwwl5A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "440095632168-l1b1aoffad4ed6n8vnluo5u2e0asc4ni.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
