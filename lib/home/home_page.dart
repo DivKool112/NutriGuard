@@ -126,7 +126,7 @@ class _HomeScreenState extends State<HomePage> {
               height: hi * 0.4,
               width: wi,
               child: Image.asset(
-                'assets/pic.jpeg',
+                'assets/pic1.png',
                 fit: BoxFit.cover,
               ),
             ),
