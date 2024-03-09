@@ -62,145 +62,187 @@ class _PersonaliseFormState extends State<PersonaliseForm> {
         (_selectedGender == 'Female' && !_isPregnantOrLactating)) {
       if (widget.sourcePage == 'manual') {
         finalPrompt =
-            '''The product name of a packaged food is - ${widget.prompt}
-Using the product name, retrieve the information about the ingredients, nutritional values, the material of their packaging, nutriscore, ecoscore, health hazards which may be associated to it, carbon footprint
+            '''We are making a food scanner app through which the users can enter the name of the product and they can get personalized analysis about it. The personalized information is retrieved through a personalisation page from the user. The user is asked for their age, gender, dietary preference, medical conditions and allergies. Now for the final analysis page, generate a report for the food product using the information given below.
 
-The consumer is a ${_selectedGender} who has an age of ${_selectedAgeGroup} and has the following medical conditions - ${_medicalConditionsController.text}. 
-The user is also allergic to ${_allergiesController.text}. 
+The product name of a packaged food is - ${widget.prompt}
+Using the product name, retrieve the information about the ingredients, nutritional values, the material of their packaging, nutriscore, ecoscore,  carbon footprint, health hazards which may be associated with it, etc.
 
-Give me a detailed analysis by firstly showing the main components and nutritional values of the product, for example, state the values of sugar, proteins, etc. 
-Then, give a separate paragraph for telling the user if the product is fit for consumption.
-Use the values of sodium and iron from the above information and compare them with the adequate consumption of these minerals while stating if the values are fit or not. 
-Furthermore, write about the cons and pros of the product by analyzing the information and the ingredients of the product. 
+The consumer is a ${_selectedGender} who falls in a age group of ${_selectedAgeGroup} and has the following medical conditions - ${_medicalConditionsController.text} (ignore if it's written none)
+The user is also allergic to ${_allergiesController.text} (ignore if written none)
+The user is a ${_selectedDietaryPreference}
 
-Write the whole response for an app page where the information is presented to the user. Write in a descriptive and informative tone. 
-Also, give a personalized response based on the allergies and medical conditions inputted above. 
-Adding to it, if there is a con in the product and if any ingredient is not adequate, give the possible health hazard related to it. 
+Give me a detailed analysis by firstly showing the main components and nutritional values of the product, for example, state the values of sugar, proteins, etc.
 
-Then, in a separate paragraph, give the information about the environmental aspect of the product like give the meaning to the ecoscore and nutriscore, describe what does the score stand for. 
-Also, use the carbon footprint to give a conclusion if the product is environmentally friendly or not. 
-Also, use the packaging material to draw out the results.
-Please use markdown to format the response.
-Give me a response which considers all the parameters above and generate a final report stating your opinion if the product is fit for consumption or not. Answer in yes or no and for the answer give a suitable reasoning.Give your response in ${_lang} language''';
+After which, in a separate paragraph, list out the pros of the ingredients of the food product and the overall effect of the product on the health of the consumers. Give long term benefits and short term benefits also if any. At Least 3.
+
+After which in a separate paragraph, list out the cons of the ingredients of the food product and the overall effect of the product on the health of the consumers. Give long term harms and short terms harms also if any. At Least 3.
+
+In the next paragraph, using all the information of the user given above like age, gender, lactating or not, dietary preference, medical conditions and allergies. Create a report for the user stating whether the consumer should consume the product and will it be fit for consumption for him/her as per their preferences. Write it in a concise manner in which you talk straight to the point and avoid any unnecessary information to be added. Make it as informative as possible in bold and effective words. 
+
+In the next paragraph, use the nutriscore of the product and state it to the user. Describe what is nutriscore and what it represents. Also say that “a” score being the best and “e” being the worst. Always tell the score between this scale. Add visuals elements to this paragraph of 5 emojis going from sad to happy representing the scores from “a” score being the happiest emoji and the “e” score being the saddest emoji.
+
+In the next paragraph, talk about the environmental aspect of the product. Firstly, state the material from which the packaging of the product is made from and state if it is environmentally friendly or not. Then by also considering the emissions in the production of the product, give out the carbon footprint which may be caused by the product. Talk about the potential benefits of the packaging material. Use the ecoscore of the product and state it to the user. Describe what ecoscore is and what it represents. Also say that “a” score being the best and “e” being the worst. Always tell the score between this scale. Add visuals elements to this paragraph of 5 emojis going from sad to happy representing the scores from “a” score being the happiest emoji and the “e” score being the saddest emoji.
+
+In the next paragraph, suggest any healthier and better alternatives than the entered product. Give reasons for choosing the alternative and how it is better. Give atleast 2 alternatives and mention their brand, product name and any necessary information.
+
+Throughout the response, consider all the EU food guidelines, WHO reports, FSSAI reports, UN’s Food and Agricultural Organisation and other important food guidelines to analyze the product. Check if the product contains any substance or ingredients which is considered harmful according to the reports or is banned in any country due to its harmful effects. If true, then mention it but don't include URLs and add in which countries it is banned.
+
+USE MARKDOWN to format the response. It is a necessary requirement. 
+
+The language of the report should be in ${_lang} language.''';
       } else if (widget.sourcePage == 'ocr') {
         finalPrompt =
-            '''A packed food product contains the following ingredients and information:
-${widget.prompt}
+            '''We are making a food scanner app through which the users can enter the name of the product and they can get personalized analysis about it. The personalized information is retrieved through a personalisation page from the user. The user is asked for their age, gender, dietary preference, medical conditions and allergies. Now for the final analysis page, generate a report for the food product using the information given below.
 
-The consumer is a ${_selectedGender} who has an age of ${_selectedAgeGroup} and has the following medical conditions - ${_medicalConditionsController.text}. 
-The user is also allergic to ${_allergiesController.text}. 
+The food product has the following ingredients: ${widget.prompt}
+Using these ingredients, retrieve the product name if you can, if you cannot just retrieve the nutritional values, the material of their packaging, nutriscore, ecoscore,  carbon footprint, health hazards which may be associated with it, etc.
 
- give a separate paragraph for telling the user if the product is fit for consumption for the user
-If the product contains sodium and iron,  compare them with the adequate consumption of these minerals while stating if the values are fit or not. 
-Furthermore, write about the cons and pros of the product by analyzing the information and the ingredients of the product. 
+The consumer is a ${_selectedGender} who falls in a age group of ${_selectedAgeGroup} and has the following medical conditions - ${_medicalConditionsController.text} ( ignore if it's written none)
+The user is also allergic to ${_allergiesController.text} (ignore if written none)
+The user is a ${_selectedDietaryPreference}
 
-Write the whole response for an app page where the information is presented to the user. Write in a descriptive and informative tone. 
-Also, give a personalized response based on the allergies and medical conditions inputted above. 
-Adding to it, if there is a con in the product and if any ingredient is not adequate, give the possible health hazard related to it. 
+Give me a detailed analysis by firstly showing the main components and nutritional values of the product, for example, state the values of sugar, proteins, etc.
 
-Then, in a separate paragraph, give the information about the environmental aspect of the product like give the meaning to the ecoscore and 
-Please use markdown to format the response.
+After which, in a separate paragraph, list out the pros of the ingredients of the food product and the overall effect of the product on the health of the consumers. Give long term benefits and short term benefits also if any. At Least 3.
 
-At last give me a conclusion in which discuss whether the product is fit for consumption . Give a direct answer in yes or a no. and give reasoning for the answer you wish to output. Considor all the parameters and the harms and benfits of each ingredient listed and then draw out a reliable result
-.Give your response in ${_lang} language''';
+After which in a separate paragraph, list out the cons of the ingredients of the food product and the overall effect of the product on the health of the consumers. Give long term harms and short terms harms also if any. At Least 3.
+
+In the next paragraph, using all the information of the user given above like age, gender, lactating or not, dietary preference, medical conditions and allergies. Create a report for the user stating whether the consumer should consume the product and will it be fit for consumption for him/her as per their preferences. Write it in a concise manner in which you talk straight to the point and avoid any unnecessary information to be added. Make it as informative as possible in bold and effective words. 
+
+In the next paragraph, use the nutriscore of the product and state it to the user. Describe what is nutriscore and what it represents. Also say that “a” score being the best and “e” being the worst. Always tell the score between this scale. Add visuals elements to this paragraph of 5 emojis going from sad to happy representing the scores from “a” score being the happiest emoji and the “e” score being the saddest emoji.
+
+In the next paragraph, talk about the environmental aspect of the product. Firstly, state the material from which the packaging of the product is made from and state if it is environmentally friendly or not. Then by also considering the emissions in the production of the product, give out the carbon footprint which may be caused by the product. Talk about the potential benefits of the packaging material . Use the ecoscore of the product and state it to the user. Describe what ecoscore is and what it represents. Also say that “a” score being the best and “e” being the worst. Always tell the score between this scale. Add visuals elements to this paragraph of 5 emojis going from sad to happy representing the scores from “a” score being the happiest emoji and the “e” score being the saddest emoji.
+
+In the next paragraph, suggest any healthier and better alternatives than the entered product. Give reasons for choosing the alternative and how it is better. Give atleast 2 alternatives and mention their brand, product name and any necessary information.
+
+Throughout the response, consider all the EU food guidelines, WHO reports, FSSAI reports, UN’s Food and Agricultural Organisation and other important food guidelines to analyze the product. Check if the product contains any substance or ingredients which is considered harmful according to the reports or is banned in any country due to its harmful effects. If true, then mention it but don't include URLs and add in which countries it is banned.
+
+USE MARKDOWN to format the response. It is a necessary requirement. 
+
+Give your response in ${_lang} language''';
       } else if (widget.sourcePage == 'barcode') {
         finalPrompt =
-            '''A packed food product contains the following ingredients and information:
-${widget.prompt}
-The name of the is - ${widget.prompt}
-If the ingredients are not listed, please use the name of the product to carry out the whole analysis.
-Retrive the information for the desired information about the product from the product name 
+            '''We are making a food scanner app through which the users can enter the name of the product and they can get personalized analysis about it. The personalized information is retrieved through a personalisation page from the user. The user is asked for their age, gender, dietary preference, medical conditions and allergies. Now for the final analysis page, generate a report for the food product using the information given below.
 
-The consumer is a ${_selectedGender} who has an age of ${_selectedAgeGroup} and has the following medical conditions - ${_medicalConditionsController.text}. 
-The user is also allergic to ${_allergiesController.text}. 
+The product has the following information: ${widget.prompt}
+Use this information and your knowledge to provide your analysis. If some values or information are not provided, retrieve its ingredients,nutritional values, the material of their packaging, nutriscore, ecoscore,  carbon footprint, health hazards which may be associated with it, etc.
 
-Give me a detailed analysis by firstly showing the main components and nutritional values of the product, for example, state the values of sugar, proteins, etc. 
-Then, give a separate paragraph for telling the user if the product is fit for consumption or not.
-Use the values of sodium and iron from the above information and compare them with the adequate consumption of these minerals while stating if the values are fit or not. 
-Furthermore, write about the cons and pros of the product by analyzing the information and the ingredients of the product. 
+The consumer is a ${_selectedGender} who falls in a age group of ${_selectedAgeGroup} and has the following medical conditions - ${_medicalConditionsController.text} ( ignore if it's written none)
+The user is also allergic to ${_allergiesController.text} (ignore if written none)
+The user is a ${_selectedDietaryPreference}
 
-Write the whole response for an app page where the information is presented to the user. Write in a descriptive and informative tone. 
-Also, give a personalized response based on the allergies and medical conditions inputted above. 
-Adding to it, if there is a con in the product and if any ingredient is not adequate, give the possible health hazard related to it. 
+Give me a detailed analysis by firstly showing the main components and nutritional values of the product, for example, state the values of sugar, proteins, etc.
 
-Then, in a separate paragraph, give the information about the environmental aspect of the product like give the meaning to the ecoscore and nutriscore, describe what does the score stand for. 
-Also, use the carbon footprint to give a conclusion if the product is environmentally friendly or not. 
-Also, use the packaging material to draw out the results.
-Please use markdown to format the response.
-If some information is not provided, dont write that the information is not provided rather just skip the part and dont emphasise on it. Only write on the analysis on the given information and do no mention about an information which is not provided. For example if nutriscore is not present, dont write about it rather move on to the next parameter.
-.Give your response in ${_lang} language''';
+After which, in a separate paragraph, list out the pros of the ingredients of the food product and the overall effect of the product on the health of the consumers. Give long term benefits and short term benefits also if any. At Least 3.
+
+After which in a separate paragraph, list out the cons of the ingredients of the food product and the overall effect of the product on the health of the consumers. Give long term harms and short terms harms also if any. At Least 3.
+
+In the next paragraph, using all the information of the user given above like age, gender, lactating or not, dietary preference, medical conditions and allergies. Create a report for the user stating whether the consumer should consume the product and will it be fit for consumption for him/her as per their preferences. Write it in a concise manner in which you talk straight to the point and avoid any unnecessary information to be added. Make it as informative as possible in bold and effective words. 
+
+In the next paragraph, use the nutriscore of the product and state it to the user. Describe what is nutriscore and what it represents. Also say that “a” score being the best and “e” being the worst. Always tell the score between this scale. Add visuals elements to this paragraph of 5 emojis going from sad to happy representing the scores from “a” score being the happiest emoji and the “e” score being the saddest emoji.
+
+In the next paragraph, talk about the environmental aspect of the product. Firstly, state the material from which the packaging of the product is made from and state if it is environmentally friendly or not. Then by also considering the emissions in the production of the product, give out the carbon footprint which may be caused by the product. Talk about the potential benefits of the packaging material. Use the ecoscore of the product and state it to the user. Describe what ecoscore is and what it represents. Also say that “a” score being the best and “e” being the worst. Always tell the score between this scale. Add visuals elements to this paragraph of 5 emojis going from sad to happy representing the scores from “a” score being the happiest emoji and the “e” score being the saddest emoji.
+
+In the next paragraph, suggest any healthier and better alternatives than the entered product. Give reasons for choosing the alternative and how it is better. Give atleast 2 alternatives and mention their brand, product name and any necessary information.
+
+Throughout the response, consider all the EU food guidelines, WHO reports, FSSAI reports, UN’s Food and Agricultural Organisation and other important food guidelines to analyze the product. Check if the product contains any substance or ingredients which is considered harmful according to the reports or is banned in any country due to its harmful effects. If true, then mention it but don't include URLs and add in which countries it is banned.
+
+USE MARKDOWN to format the response. It is a necessary requirement. 
+
+The language of the report should be ${_lang} language''';
       }
     } else {
       if (widget.sourcePage == 'manual') {
         print('manual');
-        finalPrompt = '''
-      The product name of a packaged food is - ${widget.prompt}
-Using the product name, retrieve the information about the ingredients, nutritional values, the material of their packaging, nutriscore, ecoscore, health hazards which may be associated to it, carbon footprint
+        finalPrompt = 
+          '''We are making a food scanner app through which the users can enter the name of the product and they can get personalized analysis about it. The personalized information is retrieved through a personalisation page from the user. The user is asked for their age, gender, dietary preference, medical conditions and allergies. Now for the final analysis page, generate a report for the food product using the information given below.
 
-The consumer is a ${_isPregnantOrLactating ? 'pregnant' : ''} ${_selectedGender} who has an age of ${_selectedAgeGroup} and has the following medical conditions - ${_medicalConditionsController.text}. 
-The user is also allergic to ${_allergiesController.text} and has a dietary preference of ${_selectedDietaryPreference}.
+The product name of a packaged food is - ${widget.prompt}
+Using the product name, retrieve the information about the ingredients, nutritional values, the material of their packaging, nutriscore, ecoscore,  carbon footprint, health hazards which may be associated with it, etc.
 
-Give me a detailed analysis by firstly showing the main components and nutritional values of the product, for example, state the values of sugar, proteins, etc. 
-Then, give a separate paragraph for telling the user if the product is fit for consumption for a pregnant woman. 
-Use the values of sodium and iron from the above information and compare them with the adequate consumption of these minerals while stating if the values are fit or not. 
-Furthermore, write about the cons and pros of the product by analyzing the information and the ingredients of the product. 
+The consumer is pregnant and lactating women who falls in a age group of ${_selectedAgeGroup} and also has the following medical conditions - ${_medicalConditionsController.text} ( ignore if it's written none)
+The user is also allergic to ${_allergiesController.text} (ignore if written none)
+The user is a ${_selectedDietaryPreference}
 
-Write the whole response for an app page where the information is presented to the user. Write in a descriptive and informative tone. 
-Also, give a personalized response based on the allergies and medical conditions inputted above. 
-Adding to it, if there is a con in the product and if any ingredient is not adequate, give the possible health hazard related to it. 
+Give me a detailed analysis by firstly showing the main components and nutritional values of the product, for example, state the values of sugar, proteins, etc.
 
-Then, in a separate paragraph, give the information about the environmental aspect of the product like give the meaning to the ecoscore and nutriscore, describe what does the score stand for. 
-Also, use the carbon footprint to give a conclusion if the product is environmentally friendly or not. 
-Also, use the packaging material to draw out the results.
-Please use markdown to format the response.
-Give me a response which considers all the parameters above and generate a final report stating your opinion if the product is fit for consumption for pregnant women or not. Answer in yes or no and for the answer give a suitable reasoning.
-Use markdown in your response.Give your response in ${_lang} language''';
+After which, in a separate paragraph, list out the pros of the ingredients of the food product and the overall effect of the product on the health of the consumers. Give long term benefits and short term benefits also if any. At Least 2 general and 1-2 specific for this pregnant woman.
+
+After which in a separate paragraph, list out the cons of the ingredients of the food product and the overall effect of the product on the health of the consumers. Give long term harms and short terms harms also if any. At Least 2 general and 1-2 specific for this pregnant woman.
+
+In the next paragraph, using all the information of the user given above like age, gender, lactating or not, dietary preference, medical conditions and allergies. Create a report for the user stating whether the consumer should consume the product and will it be fit for consumption for him/her as per their preferences. Write it in a concise manner in which you talk straight to the point and avoid any unnecessary information to be added. Make it as informative as possible in bold and effective words. 
+
+In the next paragraph, use the nutriscore of the product and state it to the user. Describe what is nutriscore and what it represents. Also say that “a” score being the best and “e” being the worst. Always tell the score between this scale. Add visuals elements to this paragraph of 5 emojis going from sad to happy representing the scores from “a” score being the happiest emoji and the “e” score being the saddest emoji.
+
+In the next paragraph, talk about the environmental aspect of the product. Firstly, state the material from which the packaging of the product is made from and state if it is environmentally friendly or not. Then by also considering the emissions in the production of the product, give out the carbon footprint which may be caused by the product. Talk about the potential benefits of the packaging material. Use the ecoscore of the product and state it to the user. Describe what ecoscore is and what it represents. Also say that “a” score being the best and “e” being the worst. Always tell the score between this scale. Add visuals elements to this paragraph of 5 emojis going from sad to happy representing the scores from “a” score being the happiest emoji and the “e” score being the saddest emoji.
+
+In the next paragraph, suggest any healthier and better alternatives than the entered product. Give reasons for choosing the alternative and how it is better. Give atleast 2 alternatives and mention their brand, product name and any necessary information.
+
+Throughout the response, consider all the EU food guidelines, WHO reports, FSSAI reports, UN’s Food and Agricultural Organisation and other important food guidelines to analyze the product. Check if the product contains any substance or ingredients which is considered harmful according to the reports or is banned in any country due to its harmful effects. If true, then mention it but don't include URLs and add in which countries it is banned.
+
+USE MARKDOWN to format the response. It is a necessary requirement. 
+
+The language of the report should be ${_lang} language''';
       } else if (widget.sourcePage == 'ocr') {
-        finalPrompt = '''
-A packed food product contains the following ingredients and information:
-${widget.prompt}
+        finalPrompt = 
+          '''We are making a food scanner app through which the users can enter the name of the product and they can get personalized analysis about it. The personalized information is retrieved through a personalisation page from the user. The user is asked for their age, gender, dietary preference, medical conditions and allergies. Now for the final analysis page, generate a report for the food product using the information given below.
 
-The consumer is a ${_isPregnantOrLactating ? 'pregnant' : ''} ${_selectedGender} who has an age of ${_selectedAgeGroup} and has the following medical conditions - ${_medicalConditionsController.text}. 
-The user is also allergic to ${_allergiesController.text}. and has a dietary preference of ${_selectedDietaryPreference}.
+It has the following ingredients: ${widget.prompt}
+Using these ingredients, retrieve the product name if you can, if you cannot just retrieve the nutritional values, the material of their packaging, nutriscore, ecoscore,  carbon footprint, health hazards which may be associated with it, etc.
 
-  give a separate paragraph for telling the user if the product is fit for consumption for the user. 
-If the product contains sodium and iron,  compare them with the adequate consumption of these minerals while stating if the values are fit or not. 
-Furthermore, write about the cons and pros of the product by analyzing the information and the ingredients of the product. 
+The consumer is pregnant and lactating women who falls in a age group of ${_selectedAgeGroup} and also has the following medical conditions - ${_medicalConditionsController.text} ( ignore if it's written none)
+The user is also allergic to ${_allergiesController.text} (ignore if written none)
+The user is a ${_selectedDietaryPreference}
 
-Write the whole response for an app page where the information is presented to the user. Write in a descriptive and informative tone. 
-Also, give a personalized response based on the allergies and medical conditions inputted above. 
-Adding to it, if there is a con in the product and if any ingredient is not adequate, give the possible health hazard related to it. 
+Give me a detailed analysis by firstly showing the main components and nutritional values of the product, for example, state the values of sugar, proteins, etc.
 
-Then, in a separate paragraph, give the information about the environmental aspect of the product like give the meaning to the ecoscore and 
-Please use markdown to format the response.
+After which, in a separate paragraph, list out the pros of the ingredients of the food product and the overall effect of the product on the health of the consumers. Give long term benefits and short term benefits also if any. At Least 2 general and 1-2 specific for this pregnant woman.
 
-At last give me a conclusion in which discuss whether the product is fit for consumption . Give a direct answer in yes or a no. and give reasoning for the answer you wish to output. Considor all the parameters and the harms and benfits of each ingredient listed and then draw out a reliable result
-Use markdown in your response.Give your response in ${_lang} language''';
+After which in a separate paragraph, list out the cons of the ingredients of the food product and the overall effect of the product on the health of the consumers. Give long term harms and short terms harms also if any. At Least 2 general and 1-2 specific for this pregnant woman.
+
+In the next paragraph, using all the information of the user given above like age, gender, lactating or not, dietary preference, medical conditions and allergies. Create a report for the user stating whether the consumer should consume the product and will it be fit for consumption for him/her as per their preferences. Write it in a concise manner in which you talk straight to the point and avoid any unnecessary information to be added. Make it as informative as possible in bold and effective words. 
+
+In the next paragraph, use the nutriscore of the product and state it to the user. Describe what is nutriscore and what it represents. Also say that “a” score being the best and “e” being the worst. Always tell the score between this scale. Add visuals elements to this paragraph of 5 emojis going from sad to happy representing the scores from “a” score being the happiest emoji and the “e” score being the saddest emoji.
+
+In the next paragraph, talk about the environmental aspect of the product. Firstly, state the material from which the packaging of the product is made from and state if it is environmentally friendly or not. Then by also considering the emissions in the production of the product, give out the carbon footprint which may be caused by the product. Talk about the potential benefits of the packaging material. Use the ecoscore of the product and state it to the user. Describe what ecoscore is and what it represents. Also say that “a” score being the best and “e” being the worst. Always tell the score between this scale. Add visuals elements to this paragraph of 5 emojis going from sad to happy representing the scores from “a” score being the happiest emoji and the “e” score being the saddest emoji.
+
+In the next paragraph, suggest any healthier and better alternatives than the entered product. Give reasons for choosing the alternative and how it is better. Give atleast 2 alternatives and mention their brand, product name and any necessary information.
+
+Throughout the response, consider all the EU food guidelines, WHO reports, FSSAI reports, UN’s Food and Agricultural Organisation and other important food guidelines to analyze the product. Check if the product contains any substance or ingredients which is considered harmful according to the reports or is banned in any country due to its harmful effects. If true, then mention it but don't include URLs and add in which countries it is banned.
+
+USE MARKDOWN to format the response. It is a necessary requirement. 
+
+The language of the report should be in ${_lang} language''';
       } else if (widget.sourcePage == 'barcode') {
-        finalPrompt = '''
-A packed food product contains the following ingredients and information:
-${widget.prompt}
-If the ingredients are not listed, please use the name of the product to carry out the whole analysis.
-Retrive the information for the desired information about the product from the product name 
+        finalPrompt = 
+          '''We are making a food scanner app through which the users can enter the name of the product and they can get personalized analysis about it. The personalized information is retrieved through a personalisation page from the user. The user is asked for their age, gender, dietary preference, medical conditions and allergies. Now for the final analysis page, generate a report for the food product using the information given below.
 
-The consumer is a ${_isPregnantOrLactating ? 'pregnant' : ''} ${_selectedGender} who has an age of ${_selectedAgeGroup} and has the following medical conditions - ${_medicalConditionsController.text}. 
-The user is also allergic to ${_allergiesController.text}. and has a dietary preference of ${_selectedDietaryPreference}.
+The product has the following information: ${widget.prompt}
+Use this information and your knowledge to provide your analysis. If some values or information are not provided, retrieve its ingredients,nutritional values, the material of their packaging, nutriscore, ecoscore,  carbon footprint, health hazards which may be associated with it, etc.
 
-Give me a detailed analysis by firstly showing the main components and nutritional values of the product, for example, state the values of sugar, proteins, etc. 
-Then, give a separate paragraph for telling the user if the product is fit for consumption . 
-Use the values of sodium and iron from the above information and compare them with the adequate consumption of these minerals while stating if the values are fit or not. 
-Furthermore, write about the cons and pros of the product by analyzing the information and the ingredients of the product. 
+The consumer is pregnant and lactating women who falls in a age group of ${_selectedAgeGroup} and also has the following medical conditions - ${_medicalConditionsController.text} ( ignore if it's written none)
+The user is also allergic to ${_allergiesController.text} (ignore if written none)
+The user is a ${_selectedDietaryPreference}
 
-Write the whole response for an app page where the information is presented to the user. Write in a descriptive and informative tone. 
-Also, give a personalized response based on the allergies and medical conditions inputted above. 
-Adding to it, if there is a con in the product and if any ingredient is not adequate, give the possible health hazard related to it. 
+Give me a detailed analysis by firstly showing the main components and nutritional values of the product, for example, state the values of sugar, proteins, etc.
 
-Then, in a separate paragraph, give the information about the environmental aspect of the product like give the meaning to the ecoscore and nutriscore, describe what does the score stand for. 
-Also, use the carbon footprint to give a conclusion if the product is environmentally friendly or not. 
-Also, use the packaging material to draw out the results.
-Please use markdown to format the response.
-If some information is not provided, dont write that the information is not provided rather just skip the part and dont emphasise on it. Only write on the analysis on the given information and do not mention about an information which is not provided. For example if nutriscore is not present, dont write about it rather move on to the next parameter.
-Use markdown in your response.Give your response in ${_lang} language''';
+After which, in a separate paragraph, list out the pros of the ingredients of the food product and the overall effect of the product on the health of the consumers. Give long term benefits and short term benefits also if any. At Least 2 general and 1-2 specific for this pregnant woman.
+
+After which in a separate paragraph, list out the cons of the ingredients of the food product and the overall effect of the product on the health of the consumers. Give long term harms and short terms harms also if any. At Least 2 general and 1-2 specific for this pregnant woman.
+
+In the next paragraph, using all the information of the user given above like age, gender, lactating or not, dietary preference, medical conditions and allergies. Create a report for the user stating whether the consumer should consume the product and will it be fit for consumption for him/her as per their preferences. Write it in a concise manner in which you talk straight to the point and avoid any unnecessary information to be added. Make it as informative as possible in bold and effective words. 
+
+In the next paragraph, use the nutriscore of the product and state it to the user. Describe what is nutriscore and what it represents. Also say that “a” score being the best and “e” being the worst. Always tell the score between this scale. Add visuals elements to this paragraph of 5 emojis going from sad to happy representing the scores from “a” score being the happiest emoji and the “e” score being the saddest emoji.
+
+In the next paragraph, talk about the environmental aspect of the product. Firstly, state the material from which the packaging of the product is made from and state if it is environmentally friendly or not. Then by also considering the emissions in the production of the product, give out the carbon footprint which may be caused by the product. Talk about the potential benefits of the packaging material. Use the ecoscore of the product and state it to the user. Describe what ecoscore is and what it represents. Also say that “a” score being the best and “e” being the worst. Always tell the score between this scale. Add visuals elements to this paragraph of 5 emojis going from sad to happy representing the scores from “a” score being the happiest emoji and the “e” score being the saddest emoji.
+
+In the next paragraph, suggest any healthier and better alternatives than the entered product. Give reasons for choosing the alternative and how it is better. Give atleast 2 alternatives and mention their brand, product name and any necessary information.
+
+Throughout the response, consider all the EU food guidelines, WHO reports, FSSAI reports, UN’s Food and Agricultural Organisation and other important food guidelines to analyze the product. Check if the product contains any substance or ingredients which is considered harmful according to the reports or is banned in any country due to its harmful effects. If true, then mention it but don't include URLs and add in which countries it is banned.
+
+USE MARKDOWN to format the response. It is a necessary requirement. 
+
+The language of the report should be in (lang) language ${_lang} language''';
       }
     }
 
