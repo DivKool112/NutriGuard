@@ -13,4 +13,5 @@ class Assets {
   static const String assetsPic1 = 'assets/pic1.png';
   static const String nurtiGuardAssetsLogo = 'assets/logo.jpeg';
   static const String nurtiGuardAssetsPic = 'assets/pic.jpeg';
+  static const String nurtiGuardAssetsPic1 = 'assets/pic1.jpeg';
 }

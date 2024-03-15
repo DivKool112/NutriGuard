@@ -16,22 +16,22 @@ class HomePage extends StatefulWidget {
 
 class _HomeScreenState extends State<HomePage> {
   List<String> tipTitle = [
-    'Did You Know?',
-    'Did You Know?',
-    'Did You Know?',
-    'Tip 3: Calcium',
-    'Why Is Proper Maternal Care',
-    'Tip 4: Hydration',
-    'Tip 5: Omega-3s'
+    'More Than 821 Million People',
+    '2.8 Million Death EACH YEAR',
+    'Pregnant Women Need Help',
+    'Importance of Calcium',
+    'Importance of Iron',
+    'People In Rural Areas Unknown To The Dangers',
+    'NUTRIGUARD IS HERE'
   ];
   List<String> sub = [
-    'Iron-deficiency anaemia is a condition which arises due to insufficient iron for hemoglobin production, critical for oxygen transport in red blood cells. During pregnancy, this deficiency elevates the risk of preterm birth and low birth weight. Globally, around 40% of pregnant women are affected, with higher rates in areas lacking access to iron-rich foods or supplements.',
-    'Neural tube defects (NTDs) are birth anomalies where the brain, spinal cord, and associated structures fail to close properly during fetal development. These conditions impact roughly 1 in 1,000 pregnancies worldwide, with increased occurrences in areas lacking adequate folic acid fortification in food.',
-    'Birth weight, a consequential matter, is influenced by a series of conditions characterized by deficiencies in essential nutrients such as protein, iron, and folic acid. These deficiencies impede fetal growth and development, leading to low birth weight and, in severe instances, mortality. It is estimated that approximately 15% of all births are affected by low birth weight, with elevated prevalence observed in low- and middle-income countries where maternal malnutrition prevails.',
-    'Calcium is essential for building your baby\'s bones and teeth. Get your daily dose from dairy products, tofu, and leafy greens.',
-    'Iron supports the baby\'s growth and helps prevent anemia in mothers. Find it in lean meats, beans, and fortified cereals.',
-    'Staying well-hydrated is key for healthy pregnancy. Aim for 8-10 cups of water per day, and limit caffeine.',
-    'Omega-3 fatty acids promote your baby\'s brain and eye development. Find them in fish, flaxseeds, and walnuts.'
+    'Suffer from Malnutrition globally each year as a result of poor food and dietary habits',
+    'Are attributed to obesity and diabetes related illnesses.',
+    'Nutrients such as folic acid, iron and calcium are critical for fetal development in pregnant women and are a leading cause of deformities among newborns',
+    'Calcium is essential for building your baby\'s bones and teeth. Fulfilment of daily requirements will help ensure that the baby is born healthy.',
+    'Iron supports the baby\'s growth and helps prevent anemia in mothers. Proving to be essential for people of all age groups and gender.',
+    'People residing in rural areas are unaware of their dietary choices and what\'s really going into their body. We are here to CHANGE this. We offer more than 5 native Indian Languages so that NutriGuard is accessible by everyone.',
+    'Your Food. Your Health. Our App'
   ];
   searchManually() async {
     showDialog(
@@ -126,27 +126,39 @@ class _HomeScreenState extends State<HomePage> {
               height: hi * 0.4,
               width: wi,
               child: Image.asset(
-                'assets/pic.jpeg',
+                'assets/pic1.jpeg',
                 fit: BoxFit.cover,
               ),
             ),
-            for (int i = 0; i < sub.length; i++)
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      tipTitle[i],
-                      style: TextStyle(fontSize: 17),
+            ListView.builder(
+                shrinkWrap: true,
+                physics: ClampingScrollPhysics(),
+                itemCount: tipTitle.length,
+                itemBuilder: (context, index) {
+                  return Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          tipTitle[index],
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 17),
+                        ),
+                        Text(
+                          sub[index],
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 15, color: golColor),
+                        )
+                      ],
                     ),
-                    Text(
-                      sub[i],
-                      style: TextStyle(fontSize: 15, color: golColor),
-                    )
-                  ],
-                ),
-              ),
+                  );
+                }),
+            SizedBox(
+              height: 5,
+            ),
+
             GestureDetector(
               onTap: () {
                 Navigator.push(context,
@@ -280,11 +292,19 @@ class _HomeScreenState extends State<HomePage> {
                 ),
               ),
             ),
+            SizedBox(
+              height: 5,
+            ),
 
             ///Manual Searching
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: Text('Search manually by product name'),
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              child: Text(
+                'Search manually by product name',
+                style: TextStyle(
+                  fontSize: 16,
+                ),
+              ),
             ),
             Container(
               margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),

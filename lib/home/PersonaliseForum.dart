@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:nurti_guard/const.dart';
 import 'package:read_pdf_text/read_pdf_text.dart';
 
@@ -17,6 +20,76 @@ class PersonaliseForm extends StatefulWidget {
 }
 
 class _PersonaliseFormState extends State<PersonaliseForm> {
+  InterstitialAd? _interstitialAd;
+
+  @override
+  void dispose() {
+    _interstitialAd?.dispose();
+    super.dispose();
+  }
+
+  int _numInterstitialLoadAttempts = 0;
+  int maxFailedLoadAttempts = 3;
+  void _showInterstitialAd() {
+    if (_interstitialAd == null) {
+      print('Warning: attempt to show interstitial before loaded.');
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ReportPage(prompt: finalPrompt)),
+      );
+      return;
+    }
+    _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
+      onAdDismissedFullScreenContent: (InterstitialAd ad) {
+        ad.dispose();
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ReportPage(prompt: finalPrompt)),
+          (route) => false,
+        );
+      },
+    );
+    _interstitialAd!.show();
+    _interstitialAd = null;
+  }
+
+  bool isLoaded = false;
+  void _createInterstitialAd() {
+    InterstitialAd.load(
+      adUnitId: Platform.isIOS
+          ? 'ca-app-pub-6437987663717750/2923383440'
+          : "ca-app-pub-6437987663717750/2079993497",
+      request: AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (InterstitialAd ad) {
+          setState(() {
+            isLoaded = true;
+          });
+
+          _interstitialAd = ad;
+          _numInterstitialLoadAttempts = 0;
+          // _showInterstitialAd();
+        },
+        onAdFailedToLoad: (LoadAdError error) {
+          _numInterstitialLoadAttempts += 1;
+          _interstitialAd = null;
+          if (_numInterstitialLoadAttempts < maxFailedLoadAttempts) {
+            _createInterstitialAd();
+          } else {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ReportPage(prompt: widget.prompt)),
+              (route) => false,
+            );
+          }
+        },
+      ),
+    );
+  }
+
   TextEditingController _allergiesController = TextEditingController();
   TextEditingController _medicalConditionsController = TextEditingController();
   String text = '';
@@ -25,8 +98,8 @@ class _PersonaliseFormState extends State<PersonaliseForm> {
   List<String> lang = [
     'English',
     'Hindi',
-    'Urdu',
-    'Marathi',
+    'Russian',
+    'Arabic',
     'Bengali',
     'French',
     'Spanish'
@@ -49,14 +122,33 @@ class _PersonaliseFormState extends State<PersonaliseForm> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    _createInterstitialAd();
     _selectedAgeGroup = ageGroups[0];
 
     _selectedDietaryPreference = dietaryPreferences[0];
   }
 
+  bool clicked = false;
+  String finalPrompt = '';
   submitForm() async {
+    if (!clicked) {
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+                title: Text('Error'),
+                content: Text('Please select at least one option'),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text('OK'))
+                ],
+              ));
+      return;
+    }
     print(widget.prompt);
-    String finalPrompt = '';
+
     if (_selectedGender == 'Male' ||
         _selectedGender == 'Select' ||
         (_selectedGender == 'Female' && !_isPregnantOrLactating)) {
@@ -66,7 +158,7 @@ class _PersonaliseFormState extends State<PersonaliseForm> {
 Using the product name, retrieve the information about the ingredients, nutritional values, the material of their packaging, nutriscore, ecoscore, health hazards which may be associated to it, carbon footprint
 
 The consumer is a ${_selectedGender} who has an age of ${_selectedAgeGroup} and has the following medical conditions - ${_medicalConditionsController.text}. 
-The user is also allergic to ${_allergiesController.text}. 
+The user is also allergic to ${_allergiesController.text}. The user is a ${_selectedDietaryPreference}.
 
 Give me a detailed analysis by firstly showing the main components and nutritional values of the product, for example, state the values of sugar, proteins, etc. 
 Then, give a separate paragraph for telling the user if the product is fit for consumption.
@@ -88,7 +180,7 @@ Give me a response which considers all the parameters above and generate a final
 ${widget.prompt}
 
 The consumer is a ${_selectedGender} who has an age of ${_selectedAgeGroup} and has the following medical conditions - ${_medicalConditionsController.text}. 
-The user is also allergic to ${_allergiesController.text}. 
+The user is also allergic to ${_allergiesController.text}. The user is a ${_selectedDietaryPreference}.
 
  give a separate paragraph for telling the user if the product is fit for consumption for the user
 If the product contains sodium and iron,  compare them with the adequate consumption of these minerals while stating if the values are fit or not. 
@@ -112,7 +204,7 @@ If the ingredients are not listed, please use the name of the product to carry o
 Retrive the information for the desired information about the product from the product name 
 
 The consumer is a ${_selectedGender} who has an age of ${_selectedAgeGroup} and has the following medical conditions - ${_medicalConditionsController.text}. 
-The user is also allergic to ${_allergiesController.text}. 
+The user is also allergic to ${_allergiesController.text}. The user is a ${_selectedDietaryPreference}.
 
 Give me a detailed analysis by firstly showing the main components and nutritional values of the product, for example, state the values of sugar, proteins, etc. 
 Then, give a separate paragraph for telling the user if the product is fit for consumption or not.
@@ -138,7 +230,7 @@ If some information is not provided, dont write that the information is not prov
 Using the product name, retrieve the information about the ingredients, nutritional values, the material of their packaging, nutriscore, ecoscore, health hazards which may be associated to it, carbon footprint
 
 The consumer is a ${_isPregnantOrLactating ? 'pregnant' : ''} ${_selectedGender} who has an age of ${_selectedAgeGroup} and has the following medical conditions - ${_medicalConditionsController.text}. 
-The user is also allergic to ${_allergiesController.text} and has a dietary preference of ${_selectedDietaryPreference}.
+The user is also allergic to ${_allergiesController.text} and has a dietary preference of ${_selectedDietaryPreference}.The user is a ${_selectedDietaryPreference}.
 
 Give me a detailed analysis by firstly showing the main components and nutritional values of the product, for example, state the values of sugar, proteins, etc. 
 Then, give a separate paragraph for telling the user if the product is fit for consumption for a pregnant woman. 
@@ -161,7 +253,7 @@ A packed food product contains the following ingredients and information:
 ${widget.prompt}
 
 The consumer is a ${_isPregnantOrLactating ? 'pregnant' : ''} ${_selectedGender} who has an age of ${_selectedAgeGroup} and has the following medical conditions - ${_medicalConditionsController.text}. 
-The user is also allergic to ${_allergiesController.text}. and has a dietary preference of ${_selectedDietaryPreference}.
+The user is also allergic to ${_allergiesController.text}. and has a dietary preference of ${_selectedDietaryPreference}.The user is a ${_selectedDietaryPreference}.
 
   give a separate paragraph for telling the user if the product is fit for consumption for the user. 
 If the product contains sodium and iron,  compare them with the adequate consumption of these minerals while stating if the values are fit or not. 
@@ -184,7 +276,7 @@ If the ingredients are not listed, please use the name of the product to carry o
 Retrive the information for the desired information about the product from the product name 
 
 The consumer is a ${_isPregnantOrLactating ? 'pregnant' : ''} ${_selectedGender} who has an age of ${_selectedAgeGroup} and has the following medical conditions - ${_medicalConditionsController.text}. 
-The user is also allergic to ${_allergiesController.text}. and has a dietary preference of ${_selectedDietaryPreference}.
+The user is also allergic to ${_allergiesController.text}. and has a dietary preference of ${_selectedDietaryPreference}.The user is a ${_selectedDietaryPreference}.
 
 Give me a detailed analysis by firstly showing the main components and nutritional values of the product, for example, state the values of sugar, proteins, etc. 
 Then, give a separate paragraph for telling the user if the product is fit for consumption . 
@@ -204,12 +296,7 @@ Use markdown in your response.Give your response in ${_lang} language''';
       }
     }
 
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => ReportPage(
-                  prompt: finalPrompt,
-                )));
+    _showInterstitialAd();
   }
 
   Future<String> getPDFtext(String path) async {
@@ -236,7 +323,7 @@ Use markdown in your response.Give your response in ${_lang} language''';
             systemNavigationBarColor: priColor, statusBarColor: priColor),
         backgroundColor: priColor,
         title: Text(
-          'Personalization Panel',
+          'Personalisation Panel',
           style: GoogleFonts.lato(),
         ),
       ),
@@ -247,15 +334,11 @@ Use markdown in your response.Give your response in ${_lang} language''';
             crossAxisAlignment: CrossAxisAlignment.start,
             //  mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text(
-                'Personalisation Panel',
-                style: GoogleFonts.oswald(fontSize: 20, color: Colors.black),
-              ),
               SizedBox(
                 height: 6,
               ),
               Text(
-                'Dear user, In this following page please provide us the specefic details asked in the below fields. it will help us to provide you a personalised and more accurate result',
+                'Please provide us with personal details, so that we can personalise your analysis. It will help us serve you a with more personalised and accurate analysis.',
                 style: GoogleFonts.oswald(fontSize: 17.6, color: Colors.black),
               ),
               SizedBox(
@@ -290,6 +373,7 @@ Use markdown in your response.Give your response in ${_lang} language''';
                           onChanged: (value) {
                             setState(() {
                               _selectedGender = value.toString();
+                              clicked = true;
                             });
                           },
                         ),
@@ -315,6 +399,7 @@ Use markdown in your response.Give your response in ${_lang} language''';
                           onChanged: (value) {
                             setState(() {
                               _selectedGender = value.toString();
+                              clicked = true;
                             });
                           },
                         ),
@@ -332,6 +417,7 @@ Use markdown in your response.Give your response in ${_lang} language''';
                 onChanged: (value) {
                   setState(() {
                     _selectedAgeGroup = value!;
+                    clicked = true;
                   });
                 },
                 items: ageGroups
@@ -373,6 +459,7 @@ Use markdown in your response.Give your response in ${_lang} language''';
                               setState(() {
                                 _isPregnantOrLactating =
                                     !_isPregnantOrLactating;
+                                clicked = true;
                               });
                             },
                           ),
@@ -400,6 +487,7 @@ Use markdown in your response.Give your response in ${_lang} language''';
                               setState(() {
                                 _isPregnantOrLactating =
                                     !_isPregnantOrLactating;
+                                clicked = true;
                               });
                             },
                           ),
@@ -417,6 +505,7 @@ Use markdown in your response.Give your response in ${_lang} language''';
                 onChanged: (value) {
                   setState(() {
                     _selectedDietaryPreference = value!;
+                    clicked = true;
                   });
                 },
                 items: dietaryPreferences
@@ -435,7 +524,8 @@ Use markdown in your response.Give your response in ${_lang} language''';
               ),
               TextField(
                 controller: _allergiesController,
-                decoration: InputDecoration(labelText: 'Enter the Allergies'),
+                decoration:
+                    InputDecoration(labelText: 'Enter Allergies If Any'),
               ),
               SizedBox(height: 16),
               Text(
@@ -458,6 +548,7 @@ Use markdown in your response.Give your response in ${_lang} language''';
                       var text = await getPDFtext(path!);
                       setState(() {
                         _medicalConditionsController.text = text;
+                        clicked = true;
                       });
                       print(text);
                     } else {

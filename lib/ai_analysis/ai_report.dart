@@ -74,23 +74,49 @@ class _ChatPageState extends State<ReportPage> {
                   strong: TextStyle(fontSize: 17, color: Colors.black87),
                 ),
               ))
-          : Center(child: CircularProgressIndicator()),
+          : isErr
+              ? Center(
+                  child: Text('Something went wrong! Please try again.'),
+                )
+              : SizedBox(
+                  height: MediaQuery.of(context).size.height,
+                  child: Center(
+                      child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Generating your report...'),
+                      SizedBox(height: 10),
+                      CircularProgressIndicator(
+                        strokeCap: StrokeCap.round,
+                      ),
+                    ],
+                  )),
+                ),
     );
   }
 
-  void sendMessage() async {
-    String userMessage = widget.prompt;
-    setState(() {
-      messages.add({'text': userMessage, 'isUser': true});
-    });
-    // _controller.clear();
+  bool isErr = false;
 
-    String modelResponse = await generateModelResponse(userMessage);
-    print(modelResponse);
-    setState(() {
-      messages.add({'text': modelResponse, 'isUser': false});
-      isComp = true;
-    });
+  void sendMessage() async {
+    try {
+      String userMessage = widget.prompt;
+      setState(() {
+        messages.add({'text': userMessage, 'isUser': true});
+      });
+      // _controller.clear();
+
+      String modelResponse = await generateModelResponse(userMessage);
+      print(modelResponse);
+      setState(() {
+        messages.add({'text': modelResponse, 'isUser': false});
+        isComp = true;
+      });
+    } catch (e) {
+      setState(() {
+        isErr = true;
+      });
+      // TODO
+    }
   }
 
   Future<String> generateModelResponse(String userMessage) async {

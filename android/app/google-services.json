@@ -37,6 +37,13 @@
             {
               "client_id": "440095632168-l1b1aoffad4ed6n8vnluo5u2e0asc4ni.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "440095632168-4ndqijjv4ic6ct8rbgi6o7hkd6no13pi.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.nurtiGuard"
+              }
             }
           ]
         }
