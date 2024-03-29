@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../ai_analysis/ai_report.dart';
@@ -92,7 +93,8 @@ class _InterstitialAdPageState extends State<InterstitialAdPage> {
                 children: [
                   Text('Launching ads...'),
                   SizedBox(height: 20),
-                  CircularProgressIndicator(),
+                  // CircularProgressIndicator(),
+                  SpinKitCircle(color: Color(0xFF91C788),)
                 ],
               ),
             )

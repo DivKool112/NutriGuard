@@ -1,12 +1,20 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:nurti_guard/ai_analysis/ai_controller.dart';
 import 'package:nurti_guard/const.dart';
+import 'package:nurti_guard/home/home_page.dart';
+import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:read_pdf_text/read_pdf_text.dart';
+import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 import '../ai_analysis/ai_report.dart';
 
@@ -20,8 +28,9 @@ class PersonaliseForm extends StatefulWidget {
 }
 
 class _PersonaliseFormState extends State<PersonaliseForm> {
-  InterstitialAd? _interstitialAd;
-
+  
+final storage=GetStorage();
+InterstitialAd? _interstitialAd;
   @override
   void dispose() {
     _interstitialAd?.dispose();
@@ -130,7 +139,9 @@ class _PersonaliseFormState extends State<PersonaliseForm> {
 
   bool clicked = false;
   String finalPrompt = '';
-  submitForm() async {
+  submitForm(String prompt,String sourcePage) async {
+
+    Get.put(AiController()).productName=prompt;
     if (!clicked) {
       showDialog(
           context: context,
@@ -147,18 +158,18 @@ class _PersonaliseFormState extends State<PersonaliseForm> {
               ));
       return;
     }
-    print(widget.prompt);
 
-    if (_selectedGender == 'Male' ||
-        _selectedGender == 'Select' ||
-        (_selectedGender == 'Female' && !_isPregnantOrLactating)) {
-      if (widget.sourcePage == 'manual') {
+
+    if (storage.read('gender') == 'Male' ||
+       storage.read('gender') == 'Select' ||
+        (storage.read('gender') == 'Female' && !storage.read('isPregnantOrLactating'))) {
+      if (sourcePage == 'manual') {
         finalPrompt =
-            '''The product name of a packaged food is - ${widget.prompt}
+            '''The product name of a packaged food is - ${prompt}
 Using the product name, retrieve the information about the ingredients, nutritional values, the material of their packaging, nutriscore, ecoscore, health hazards which may be associated to it, carbon footprint
 
-The consumer is a ${_selectedGender} who has an age of ${_selectedAgeGroup} and has the following medical conditions - ${_medicalConditionsController.text}. 
-The user is also allergic to ${_allergiesController.text}. The user is a ${_selectedDietaryPreference}.
+The consumer is a ${storage.read('gender')} who has an age of ${storage.read('selectedAgeGroup')} and has the following medical conditions - ${storage.read('medicalConditions')}. 
+The user is also allergic to ${storage.read('allergies')}. The user is a ${storage.read('dietaryPreference')}.
 
 Give me a detailed analysis by firstly showing the main components and nutritional values of the product, for example, state the values of sugar, proteins, etc. 
 Then, give a separate paragraph for telling the user if the product is fit for consumption.
@@ -173,14 +184,14 @@ Then, in a separate paragraph, give the information about the environmental aspe
 Also, use the carbon footprint to give a conclusion if the product is environmentally friendly or not. 
 Also, use the packaging material to draw out the results.
 Please use markdown to format the response.
-Give me a response which considers all the parameters above and generate a final report stating your opinion if the product is fit for consumption or not. Answer in yes or no and for the answer give a suitable reasoning.Give your response in ${_lang} language''';
-      } else if (widget.sourcePage == 'ocr') {
+Give me a response which considers all the parameters above and generate a final report stating your opinion if the product is fit for consumption or not. Answer in yes or no and for the answer give a suitable reasoning.Give your response in ${storage.read('language')} language''';
+      } else if (sourcePage == 'ocr') {
         finalPrompt =
             '''A packed food product contains the following ingredients and information:
-${widget.prompt}
+${prompt}
 
-The consumer is a ${_selectedGender} who has an age of ${_selectedAgeGroup} and has the following medical conditions - ${_medicalConditionsController.text}. 
-The user is also allergic to ${_allergiesController.text}. The user is a ${_selectedDietaryPreference}.
+The consumer is a ${storage.read('gender')} who has an age of ${storage.read('selectedAgeGroup')} and has the following medical conditions - ${storage.read('medicalConditions')}. 
+The user is also allergic to ${storage.read('allergies')}. The user is a ${storage.read('dietaryPreference')}.
 
  give a separate paragraph for telling the user if the product is fit for consumption for the user
 If the product contains sodium and iron,  compare them with the adequate consumption of these minerals while stating if the values are fit or not. 
@@ -194,17 +205,17 @@ Then, in a separate paragraph, give the information about the environmental aspe
 Please use markdown to format the response.
 
 At last give me a conclusion in which discuss whether the product is fit for consumption . Give a direct answer in yes or a no. and give reasoning for the answer you wish to output. Considor all the parameters and the harms and benfits of each ingredient listed and then draw out a reliable result
-.Give your response in ${_lang} language''';
-      } else if (widget.sourcePage == 'barcode') {
+.Give your response in ${storage.read('language')} language''';
+      } else if (sourcePage == 'barcode') {
         finalPrompt =
             '''A packed food product contains the following ingredients and information:
-${widget.prompt}
-The name of the is - ${widget.prompt}
+${prompt}
+The name of the is - ${prompt}
 If the ingredients are not listed, please use the name of the product to carry out the whole analysis.
 Retrive the information for the desired information about the product from the product name 
 
-The consumer is a ${_selectedGender} who has an age of ${_selectedAgeGroup} and has the following medical conditions - ${_medicalConditionsController.text}. 
-The user is also allergic to ${_allergiesController.text}. The user is a ${_selectedDietaryPreference}.
+The consumer is a ${storage.read('gender')} who has an age of ${storage.read('selectedAgeGroup')} and has the following medical conditions - ${storage.read('medicalConditions')}. 
+The user is also allergic to ${storage.read('allergies')}. The user is a ${storage.read('dietaryPreference')}.
 
 Give me a detailed analysis by firstly showing the main components and nutritional values of the product, for example, state the values of sugar, proteins, etc. 
 Then, give a separate paragraph for telling the user if the product is fit for consumption or not.
@@ -220,17 +231,17 @@ Also, use the carbon footprint to give a conclusion if the product is environmen
 Also, use the packaging material to draw out the results.
 Please use markdown to format the response.
 If some information is not provided, dont write that the information is not provided rather just skip the part and dont emphasise on it. Only write on the analysis on the given information and do no mention about an information which is not provided. For example if nutriscore is not present, dont write about it rather move on to the next parameter.
-.Give your response in ${_lang} language''';
+.Give your response in ${storage.read('language')} language''';
       }
     } else {
-      if (widget.sourcePage == 'manual') {
+      if (sourcePage== 'manual') {
         print('manual');
         finalPrompt = '''
-      The product name of a packaged food is - ${widget.prompt}
+      The product name of a packaged food is - ${prompt}
 Using the product name, retrieve the information about the ingredients, nutritional values, the material of their packaging, nutriscore, ecoscore, health hazards which may be associated to it, carbon footprint
 
-The consumer is a ${_isPregnantOrLactating ? 'pregnant' : ''} ${_selectedGender} who has an age of ${_selectedAgeGroup} and has the following medical conditions - ${_medicalConditionsController.text}. 
-The user is also allergic to ${_allergiesController.text} and has a dietary preference of ${_selectedDietaryPreference}.The user is a ${_selectedDietaryPreference}.
+The consumer is a ${storage.read('isPregnantOrLactating') ? 'pregnant' : ''} ${storage.read('gender')} who has an age of ${storage.read('selectedAgeGroup')} and has the following medical conditions - ${storage.read('medicalConditions')}. 
+The user is also allergic to ${storage.read('allergies')} and has a dietary preference of ${storage.read('dietaryPreference')}.The user is a ${storage.read('dietaryPreference')}.
 
 Give me a detailed analysis by firstly showing the main components and nutritional values of the product, for example, state the values of sugar, proteins, etc. 
 Then, give a separate paragraph for telling the user if the product is fit for consumption for a pregnant woman. 
@@ -246,14 +257,14 @@ Also, use the carbon footprint to give a conclusion if the product is environmen
 Also, use the packaging material to draw out the results.
 Please use markdown to format the response.
 Give me a response which considers all the parameters above and generate a final report stating your opinion if the product is fit for consumption for pregnant women or not. Answer in yes or no and for the answer give a suitable reasoning.
-Use markdown in your response.Give your response in ${_lang} language''';
-      } else if (widget.sourcePage == 'ocr') {
+Use markdown in your response.Give your response in ${storage.read('language')} language''';
+      } else if (sourcePage== 'ocr') {
         finalPrompt = '''
 A packed food product contains the following ingredients and information:
-${widget.prompt}
+${prompt}
 
-The consumer is a ${_isPregnantOrLactating ? 'pregnant' : ''} ${_selectedGender} who has an age of ${_selectedAgeGroup} and has the following medical conditions - ${_medicalConditionsController.text}. 
-The user is also allergic to ${_allergiesController.text}. and has a dietary preference of ${_selectedDietaryPreference}.The user is a ${_selectedDietaryPreference}.
+The consumer is a ${storage.read('isPregnantOrLactating') ? 'pregnant' : ''} ${storage.read('gender')} who has an age of ${storage.read('selectedAgeGroup')} and has the following medical conditions - ${storage.read('medicalConditions')}. 
+The user is also allergic to ${storage.read('allergies')}. and has a dietary preference of ${storage.read('dietaryPreference')}.The user is a ${storage.read('dietaryPreference')}.
 
   give a separate paragraph for telling the user if the product is fit for consumption for the user. 
 If the product contains sodium and iron,  compare them with the adequate consumption of these minerals while stating if the values are fit or not. 
@@ -267,16 +278,16 @@ Then, in a separate paragraph, give the information about the environmental aspe
 Please use markdown to format the response.
 
 At last give me a conclusion in which discuss whether the product is fit for consumption . Give a direct answer in yes or a no. and give reasoning for the answer you wish to output. Considor all the parameters and the harms and benfits of each ingredient listed and then draw out a reliable result
-Use markdown in your response.Give your response in ${_lang} language''';
-      } else if (widget.sourcePage == 'barcode') {
+Use markdown in your response.Give your response in ${storage.read('language')} language''';
+      } else if (sourcePage== 'barcode') {
         finalPrompt = '''
 A packed food product contains the following ingredients and information:
-${widget.prompt}
+${prompt}
 If the ingredients are not listed, please use the name of the product to carry out the whole analysis.
 Retrive the information for the desired information about the product from the product name 
 
-The consumer is a ${_isPregnantOrLactating ? 'pregnant' : ''} ${_selectedGender} who has an age of ${_selectedAgeGroup} and has the following medical conditions - ${_medicalConditionsController.text}. 
-The user is also allergic to ${_allergiesController.text}. and has a dietary preference of ${_selectedDietaryPreference}.The user is a ${_selectedDietaryPreference}.
+The consumer is a ${storage.read('isPregnantOrLactating') ? 'pregnant' : ''} ${storage.read('gender')} who has an age of ${storage.read('selectedAgeGroup')} and has the following medical conditions - ${storage.read('medicalConditions')}. 
+The user is also allergic to ${storage.read('allergies')}. and has a dietary preference of ${storage.read('dietaryPreference')}.The user is a ${storage.read('dietaryPreference')}.
 
 Give me a detailed analysis by firstly showing the main components and nutritional values of the product, for example, state the values of sugar, proteins, etc. 
 Then, give a separate paragraph for telling the user if the product is fit for consumption . 
@@ -292,7 +303,7 @@ Also, use the carbon footprint to give a conclusion if the product is environmen
 Also, use the packaging material to draw out the results.
 Please use markdown to format the response.
 If some information is not provided, dont write that the information is not provided rather just skip the part and dont emphasise on it. Only write on the analysis on the given information and do not mention about an information which is not provided. For example if nutriscore is not present, dont write about it rather move on to the next parameter.
-Use markdown in your response.Give your response in ${_lang} language''';
+Use markdown in your response.Give your response in ${storage.read('language')} language''';
       }
     }
 
@@ -311,21 +322,47 @@ Use markdown in your response.Give your response in ${_lang} language''';
 
   var _selectedGender = '';
   var _isPregnantOrLactating = false;
-
+  TextStyle titleFont = GoogleFonts.signika(
+    fontWeight: FontWeight.w400,
+    fontSize: 18.sp,
+    color: Color(0xFF4D4B4B),
+  );
+  TextStyle hintFont = GoogleFonts.signika(
+      fontSize: 14.sp, fontWeight: FontWeight.w400, color: Color(0xFF4D4B4B));
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+// storage.read('isFormFilled')?    submitForm():null;
+// submitForm();
+
+return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            // Navigator.push(
+            //     context, MaterialPageRoute(builder: (context) => BottomNav()));
+            // Navigator.pop(context);
+            PersistentNavBarNavigator.pushNewScreen(
+              context,
+              screen: HomePage(),
+              withNavBar: true, // OPTIONAL VALUE. True by default.
+              pageTransitionAnimation: PageTransitionAnimation.cupertino,
+            );
+          },
+          icon: Icon(
+            Icons.arrow_back,
+          ),
+        ),
         automaticallyImplyLeading: false,
-        // centerTitle: true,
+        centerTitle: true,
         systemOverlayStyle: SystemUiOverlayStyle(
             systemNavigationBarColor: priColor, statusBarColor: priColor),
-        backgroundColor: priColor,
-        title: Text(
-          'Personalisation Panel',
-          style: GoogleFonts.lato(),
-        ),
+        title: Text('Personalisation Panel',
+            style: GoogleFonts.signika(
+              fontWeight: FontWeight.w400,
+              fontSize: 18.sp,
+              color: Colors.black,
+            )),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -338,9 +375,12 @@ Use markdown in your response.Give your response in ${_lang} language''';
                 height: 6,
               ),
               Text(
-                'Please provide us with personal details, so that we can personalise your analysis. It will help us serve you a with more personalised and accurate analysis.',
-                style: GoogleFonts.oswald(fontSize: 17.6, color: Colors.black),
-              ),
+                  'Please provide us with personal details, so that we can personalise your analysis. It will help us serve you a with more personalised and accurate analysis.',
+                  style: GoogleFonts.signika(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.black,
+                  )),
               SizedBox(
                 height: 6,
               ),
@@ -348,270 +388,389 @@ Use markdown in your response.Give your response in ${_lang} language''';
               SizedBox(
                 height: 6,
               ),
-              Text(
-                'Gender',
-                style: GoogleFonts.oswald(fontSize: 19, color: Colors.black),
-              ),
+              Text('Gender', style: titleFont),
               SizedBox(
-                height: 10,
+                height: 20.h,
               ),
               Row(
                 children: [
-                  Container(
-                    height: MediaQuery.of(context).size.height * 0.04,
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: priColor),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Radio(
-                          value: 'Male',
-                          activeColor: Colors.white,
-                          groupValue: _selectedGender,
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedGender = value.toString();
-                              clicked = true;
-                            });
-                          },
-                        ),
-                        Text('Male'),
-                      ],
+                  ZoomTapAnimation(
+                    onTap: ()async {
+                      setState(() {
+                        _selectedGender = "Male";
+                      });
+                      await storage.write('gender', 'Male');
+                    },
+                    child: CommonSelectionButton(
+                      title: 'Male',
+                      color: _selectedGender == "Male"
+                          ? Color(0xFF9FD796)
+                          : Color(0xFFD9D9D9),
                     ),
                   ),
                   SizedBox(
-                    width: 10,
+                    width: 18.w,
                   ),
-                  Container(
-                    height: MediaQuery.of(context).size.height * 0.04,
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: priColor),
-                    child: Row(
-                      children: [
-                        Radio(
-                          activeColor: Colors.white,
-                          value: 'Female',
-                          groupValue: _selectedGender,
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedGender = value.toString();
-                              clicked = true;
-                            });
-                          },
-                        ),
-                        Text('Female'),
-                      ],
+                  ZoomTapAnimation(
+                    onTap: () async{
+                      setState(() {
+                        _selectedGender = "Female";
+                      });
+                        await storage.write('gender', 'Female');
+                    },
+                    child: CommonSelectionButton(
+                      title: 'Female',
+                      color: _selectedGender == "Female"
+                          ? Color(0xFF9FD796)
+                          : Color(0xFFD9D9D9),
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 16),
-              Text('Age Group',
-                  style: GoogleFonts.oswald(color: Colors.black, fontSize: 19)),
-              DropdownButton<String>(
-                value: _selectedAgeGroup,
-                onChanged: (value) {
-                  setState(() {
-                    _selectedAgeGroup = value!;
-                    clicked = true;
-                  });
-                },
-                items: ageGroups
-                    .map<DropdownMenuItem<String>>(
-                      (String value) => DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      ),
-                    )
-                    .toList(),
+             
+              SizedBox(height: 34.h),
+              Text('Age Group', style: titleFont),
+              SizedBox(
+                height: 20.h,
+              ),
+              Container(
+                height: 46.h,
+                width: 140.w,
+                decoration: BoxDecoration(
+                    color: Color(0xFFFFF8EB),
+                    borderRadius: BorderRadius.circular(12.w)),
+                child: Center(
+                  child: DropdownButton<String>(
+                    value: _selectedAgeGroup,
+                    onChanged: (value) async{
+                      setState(() {
+                        _selectedAgeGroup = value!;
+                        clicked = true;
+                      });
+                      await storage.write('selectedAgeGroup', _selectedAgeGroup);
+                    },
+                    items: ageGroups
+                        .map<DropdownMenuItem<String>>(
+                          (String value) => DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(
+                              value,
+                              style: hintFont.copyWith(
+                                  fontWeight: FontWeight.w400),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 34.h,
               ),
               if (_selectedGender == 'Female')
                 Text(
                   'Pregnant or Lactating',
-                  style: GoogleFonts.oswald(fontSize: 19, color: Colors.black),
+                  style: titleFont,
                 ),
               if (_selectedGender == 'Female')
                 SizedBox(
-                  height: 10,
+                  height: 20.h,
                 ),
               if (_selectedGender == 'Female')
-                Row(
+                Column(
                   children: [
-                    Container(
-                      height: MediaQuery.of(context).size.height * 0.04,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: priColor),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Radio(
-                            activeColor: Colors.white,
-                            value: true,
-                            groupValue: _isPregnantOrLactating,
-                            onChanged: (value) {
-                              setState(() {
-                                _isPregnantOrLactating =
-                                    !_isPregnantOrLactating;
-                                clicked = true;
-                              });
-                            },
+                    Row(
+                      children: [
+                       
+                        ZoomTapAnimation(
+                          onTap: () async{
+                            setState(() {
+                              _isPregnantOrLactating = true;
+                            });
+                          await  storage.write('isPregnantOrLactating', true);
+                          },
+                          child: CommonSelectionButton(
+                              title: "Yes",
+                              color: _isPregnantOrLactating
+                                  ? Color(0xFF9FD796)
+                                  : Color(0xFFD9D9D9)),
+                        ),
+                        SizedBox(
+                          width: 18.w,
+                        ),
+                        ZoomTapAnimation(
+                          onTap: () async{
+                            setState(() {
+                              _isPregnantOrLactating = false;
+                            });
+                             await  storage.write('isPregnantOrLactating',false);
+                          },
+                          child: CommonSelectionButton(
+                            title: "No",
+                            color: !_isPregnantOrLactating
+                                ? Color(0xFF9FD796)
+                                : Color(0xFFD9D9D9),
                           ),
-                          Text('Yes'),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Container(
-                      height: MediaQuery.of(context).size.height * 0.04,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: priColor),
-                      child: Row(
-                        children: [
-                          Radio(
-                            activeColor: Colors.white,
-                            value: false,
-                            groupValue: _isPregnantOrLactating,
-                            onChanged: (value) {
-                              setState(() {
-                                _isPregnantOrLactating =
-                                    !_isPregnantOrLactating;
-                                clicked = true;
-                              });
-                            },
-                          ),
-                          Text('No'),
-                        ],
-                      ),
-                    ),
+                    SizedBox(height: 34.h),
                   ],
                 ),
-              SizedBox(height: 16),
-              Text('Dietary Preference',
-                  style: GoogleFonts.oswald(color: Colors.black, fontSize: 19)),
-              DropdownButton<String>(
-                value: _selectedDietaryPreference,
-                onChanged: (value) {
-                  setState(() {
-                    _selectedDietaryPreference = value!;
-                    clicked = true;
-                  });
-                },
-                items: dietaryPreferences
-                    .map<DropdownMenuItem<String>>(
-                      (String value) => DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      ),
-                    )
-                    .toList(),
-              ),
-              SizedBox(height: 16),
-              Text(
-                'Allergies',
-                style: GoogleFonts.oswald(fontSize: 19, color: Colors.black),
-              ),
-              TextField(
-                controller: _allergiesController,
-                decoration:
-                    InputDecoration(labelText: 'Enter Allergies If Any'),
-              ),
-              SizedBox(height: 16),
-              Text(
-                'Medical Conditions',
-                style: GoogleFonts.oswald(fontSize: 19, color: Colors.black),
-              ),
-              TextField(
-                controller: _medicalConditionsController,
-                decoration: InputDecoration(
-                    labelText: 'Enter Medical Conditions if any'),
-              ),
+
+              Text('Dietary Preference', style: titleFont),
               SizedBox(
-                height: 50,
-                child: TextButton(
-                  onPressed: () async {
-                    var file = await FilePicker.platform.pickFiles(
-                        type: FileType.custom, allowedExtensions: ['pdf']);
-                    if (file != null) {
-                      var path = file.files.single.path;
-                      var text = await getPDFtext(path!);
+                height: 20.h,
+              ),
+              Container(
+                height: 46.h,
+                width: 155.w,
+                decoration: BoxDecoration(
+                    color: Color(0xFFFFF8EB),
+                    borderRadius: BorderRadius.circular(12.w)),
+                child: Center(
+                  child: DropdownButton<String>(
+                    value: _selectedDietaryPreference,
+                    onChanged: (value)async {
                       setState(() {
-                        _medicalConditionsController.text = text;
+                        _selectedDietaryPreference = value!;
                         clicked = true;
                       });
-                      print(text);
-                    } else {
-                      // Implement the logic to upload PDF file
-                      // This could open a file picker or any relevant action
-                    }
-                    showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                              title: Text('PDF Uploaded'),
-                              content: Text(
-                                  'The PDF has been uploaded successfully'),
-                              actions: [
-                                TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    child: Text('OK'))
-                              ],
-                            ));
-                  },
-                  child: Text('or Upload PDF'),
+                      storage.write('dietaryPreference', _selectedDietaryPreference);
+                    },
+                    items: dietaryPreferences
+                        .map<DropdownMenuItem<String>>(
+                          (String value) => DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(
+                              value,
+                              style: hintFont.copyWith(
+                                  fontWeight: FontWeight.w400),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ),
                 ),
               ),
-              SizedBox(height: 16),
-              Text('Preferred Language',
-                  style: GoogleFonts.oswald(color: Colors.black, fontSize: 19)),
-              DropdownButton<String>(
-                value: _lang,
-                onChanged: (value) {
-                  setState(() {
-                    _lang = value!;
-                  });
-                },
-                items: lang
-                    .map<DropdownMenuItem<String>>(
-                      (String value) => DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      ),
-                    )
-                    .toList(),
+              SizedBox(height: 34.h),
+              Text(
+                'Allergies',
+                style: titleFont,
               ),
-              Center(
-                child: InkWell(
-                  onTap: submitForm,
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: priColor,
-                        borderRadius: BorderRadius.circular(13)),
-                    padding: EdgeInsets.all(10),
-                    child: Text(
-                      'Submit',
-                      style:
-                          GoogleFonts.oswald(fontSize: 17, color: Colors.black),
+              SizedBox(
+                height: 20.h,
+              ),
+              Container(
+                width: 190.w,
+                height: 49.h,
+                decoration: BoxDecoration(
+                    color: Color(0xFFEFF7EE),
+                    borderRadius: BorderRadius.circular(12.w)),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(
+                    child: TextField(
+                      controller: _allergiesController,
+                      decoration: InputDecoration(
+                          border: InputBorder.none,
+                          labelText: 'Enter Allergies If Any',
+                          labelStyle: hintFont),
                     ),
                   ),
                 ),
+              ),
+              SizedBox(height: 34.h),
+              Text(
+                'Medical Conditions',
+                style: titleFont,
+              ),
+              SizedBox(
+                height: 20.h,
+              ),
+              Container(
+                width: 240.w,
+                height: 49.h,
+                decoration: BoxDecoration(
+                    color: Color(0xFFEFF7EE),
+                    borderRadius: BorderRadius.circular(12.w)),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: _medicalConditionsController,
+                    decoration: InputDecoration(
+                        border: InputBorder.none,
+                        labelText: 'Enter Medical Conditions if any',
+                        labelStyle: hintFont),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 14.h,
+              ),
+              ZoomTapAnimation(
+                onTap: () async {
+                  var file = await FilePicker.platform.pickFiles(
+                      type: FileType.custom, allowedExtensions: ['pdf']);
+                  if (file != null) {
+                    var path = file.files.single.path;
+                    var text = await getPDFtext(path!);
+                    setState(() {
+                      _medicalConditionsController.text = text;
+                      clicked = true;
+                    });
+                    print(text);
+                  } else {
+                    // Implement the logic to upload PDF file
+                    // This could open a file picker or any relevant action
+                  }
+                  showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                            title: Text('PDF Uploaded'),
+                            content:
+                                Text('The PDF has been uploaded successfully'),
+                            actions: [
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text('OK'))
+                            ],
+                          ));
+                },
+                child: Container(
+                  height: 36.h,
+                  width: 133.w,
+                  decoration: BoxDecoration(
+                      color: Color(0xFFD9D9D9),
+                      borderRadius: BorderRadius.circular(12.w)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Icon(
+                          CupertinoIcons.cloud_upload,
+                          color: Colors.black,
+                        ),
+                        SizedBox(
+                          width: 8.w,
+                        ),
+                        Text(
+                          "Upload PDF",
+                          style: GoogleFonts.signika(
+                              fontWeight: FontWeight.w400,
+                              color: Colors.black,
+                              fontSize: 16.sp),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 34.h,
+              ),
+       
+
+              Text('Preferred Language', style: titleFont),
+              SizedBox(
+                height: 20.h,
+              ),
+              Container(
+                height: 46.h,
+                width: 100.w,
+                decoration: BoxDecoration(
+                    color: Color(0xFFFFF8EB),
+                    borderRadius: BorderRadius.circular(12.w)),
+                child: Center(
+                  child: DropdownButton<String>(
+                    value: _lang,
+                    onChanged: (value) async{
+                      setState(() {
+                        _lang = value!;
+                      });
+                      await storage.write('language', _lang);
+                    },
+                    items: lang
+                        .map<DropdownMenuItem<String>>(
+                          (String value) => DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(
+                              value,
+                              style: hintFont,
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 34.h,
+              ),
+          
+              ZoomTapAnimation(
+                onTap: (){
+ submitForm(widget.prompt,widget.sourcePage);
+                },
+               
+                child: Center(
+                  child: Container(
+                    height: 65.h,
+                    width: 244.w,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(24.w),
+                      color: Color(0xFF91C788),
+                    ),
+                    child: Center(
+                      child: Text(
+                        "Submit",
+                        style: GoogleFonts.signika(
+                            fontSize: 25.h,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 22.h,
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class CommonSelectionButton extends StatelessWidget {
+  const CommonSelectionButton({
+    super.key,
+    required this.title,
+    required this.color,
+  });
+  final String title;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 74.w,
+      height: 36.h,
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(12.w),
+      ),
+      child: Center(
+          child: Text(
+        title,
+        style: GoogleFonts.signika(
+            fontWeight: FontWeight.w400, fontSize: 16.sp, color: Colors.black),
+      )),
     );
   }
 }

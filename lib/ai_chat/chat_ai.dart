@@ -1,6 +1,8 @@
 import 'package:chat_bubbles/bubbles/bubble_normal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:googleai_dart/googleai_dart.dart';
 import 'package:nurti_guard/const.dart';
 
@@ -26,10 +28,16 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         automaticallyImplyLeading: false,
-        backgroundColor: priColor,
+        // backgroundColor: priColor,
         systemOverlayStyle: SystemUiOverlayStyle(statusBarColor: priColor),
-        title: Text('Chat with AI'),
+        title: Text('Chat with AI',
+            style: GoogleFonts.signika(
+              fontWeight: FontWeight.w400,
+              fontSize: 18.sp,
+              color: Colors.black,
+            )),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -55,6 +63,7 @@ class _ChatPageState extends State<ChatPage> {
             Padding(
               padding: EdgeInsets.all(8.0),
               child: Container(
+                height: 67.h,
                 decoration: BoxDecoration(
                     color: Colors.grey.withOpacity(0.3),
                     boxShadow: [],
@@ -137,11 +146,14 @@ class ChatMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BubbleNormal(
+      bubbleRadius: 12.w,
       margin: EdgeInsets.symmetric(vertical: 5),
-      leading: isUser ? Icon(Icons.person) : Icon(Icons.desktop_mac_outlined),
+      leading:
+          isUser ? Icon(Icons.person) : Image.asset("assets/chat_bot_icon.png"),
       text: text,
       isSender: isUser,
-      color: isUser ? Colors.grey.withOpacity(0.4) : Color(0xFF1B97F3),
+      // color: isUser ? Colors.grey.withOpacity(0.4) : Color(0xFF1B97F3),
+      color: isUser ? Color(0xFFEAE5E5) : Color(0xFF9FD796),
       tail: true,
       textStyle: TextStyle(
         fontSize: 16,

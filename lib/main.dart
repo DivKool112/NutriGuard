@@ -1,20 +1,32 @@
+import 'dart:ui';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:nurti_guard/const.dart';
 import 'package:nurti_guard/firebase_options.dart';
+import 'package:nurti_guard/home/home_page.dart';
+import 'package:nurti_guard/onboarding/onboarding_view.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
 import 'package:social_auth_buttons/res/buttons/google_auth_button.dart';
+import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
-import 'home/bottomNav.dart';
+import 'home/bottom_nav.dart';
 
 var gK = 'AIzaSyC_GIqQJSIBxZu-lblDJa0aLBiX-l6Rogw';
 Future<void> main() async {
+  await GetStorage.init();
   try {
     WidgetsFlutterBinding.ensureInitialized();
+
     OpenFoodAPIConfiguration.userAgent = UserAgent(
       name: 'Nutri Guard',
     );
@@ -27,6 +39,14 @@ Future<void> main() async {
   } catch (e) {
     print('Error: $e');
   }
+  SystemChrome.setPreferredOrientations(<DeviceOrientation>[
+    DeviceOrientation.portraitUp,
+  ]);
+
+  await ScreenUtil.ensureScreenSize();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
   runApp(const MyApp());
 }
 
@@ -40,15 +60,31 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: priColor),
-          useMaterial3: true,
-          textTheme: GoogleFonts.oswaldTextTheme()),
-      home: const SplashScreen(),
-    );
+    return OrientationBuilder(builder: (context, orientation) {
+      return ScreenUtilInit(
+          designSize: const Size(375, 812),
+          builder: (_, __) {
+            return GestureDetector(
+              onTap: () {
+                FocusScopeNode currentFocus = FocusScope.of(context);
+                if (!currentFocus.hasPrimaryFocus) {
+                  currentFocus.unfocus();
+                }
+              },
+              child: GetMaterialApp(
+                debugShowCheckedModeBanner: false,
+                title: 'Flutter Demo',
+                theme: ThemeData(
+                    colorScheme: ColorScheme.fromSeed(seedColor: priColor),
+                    useMaterial3: true,
+                    textTheme: GoogleFonts.oswaldTextTheme()),
+                home: const SplashScreen(),
+                // home: OnboardingView(),
+                // home: BottomNav(),
+              ),
+            );
+          });
+    });
   }
 }
 
@@ -76,7 +112,7 @@ class _SplashScreenState extends State<SplashScreen> {
       var user = await firebaseAuth.signInWithProvider(GoogleAuthProvider());
       if (user.user?.emailVerified == true) {
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => HomeScreen()));
+            context, MaterialPageRoute(builder: (context) => OnboardingView()));
       } else {
         showDialog(
             context: context,
@@ -103,104 +139,137 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: priColor,
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.15,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(height: 83.h),
+            Center(
+              child: Text(
+                'Welcome To',
+                style: GoogleFonts.signika(
+                    fontSize: 24.sp, color: Color(0xFF848484)),
               ),
-              Center(
-                child: Text(
-                  'WELCOME TO',
-                  style: GoogleFonts.aBeeZee(
-                      fontSize: 23, fontWeight: FontWeight.w800),
+            ),
+            // SizedBox(
+            //   height: 10.h,
+            // ),
+            // SizedBox(
+            //   width: 136.h,
+            //   child: Text(
+            //     "Nutri Guard",
+            //     textAlign: TextAlign.center,
+            //     style: GoogleFonts.signika(
+            //       fontWeight: FontWeight.bold,
+            //       fontSize: 35.sp,
+            //       color: Color(0xFF89BA81),
+            //     ),
+            //   ),
+            // ),
+            Image.asset(
+              "assets/app_logo.png",
+              width: 136.w,
+              height: 170.h,
+            ),
+            // SizedBox(
+            //   height: 22.h,
+            // ),
+            ClipRRect(
+                borderRadius: BorderRadius.circular(14.w),
+                child: Image.asset("assets/signup_image.png")),
+            SizedBox(
+              height: 45.h,
+            ),
+            Center(
+              child: Text(
+                'Sign in to continue',
+                style: GoogleFonts.signika(
+                    fontSize: 17.sp,
+                    color: Color(0xFF7c7c7c),
+                    fontWeight: FontWeight.w500),
+              ),
+            ),
+            SizedBox(height: 43.h),
+            ZoomTapAnimation(
+              onTap: () {
+                Get.to(OnboardingView());
+              }, //_handleSignIn,
+              child: SignInButton(
+                imgLoc: "assets/google_icon.png",
+                title: "Google",
+              ),
+            ),
+
+            SizedBox(height: 22.h),
+            ZoomTapAnimation(
+                onTap: () {
+                  // Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(
+                  //         builder: (context) => PhoneSignUpScreen()));
+                  Get.to(OnboardingView());
+                },
+                child: SignInButton(
+                    imgLoc: "assets/phone_icon.png", title: "Phone")),
+            // Phone sign up button
+
+            SizedBox(height: 20),
+            Container(
+              decoration: BoxDecoration(
+                color: priColor,
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(100.0),
+                  topLeft: Radius.circular(100.0),
                 ),
               ),
-              SizedBox(
-                height: 7,
-              ),
-              Image.asset(
-                'assets/logo.jpeg',
-                scale: 1,
-                height: MediaQuery.of(context).size.height * 0.12,
-              ),
-              Image.asset(
-                'assets/diet.png',
-                height: MediaQuery.of(context).size.height * 0.35,
-              ),
-              // SizedBox(
-              //   height: MediaQuery.of(context).size.height * 0.03,
-              // ),
-              Center(
-                child: Text(
-                  'Sign in to continue',
-                  style: GoogleFonts.lato(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white),
-                ),
-              ),
-              SizedBox(height: 10),
-              GoogleAuthButton(
-                width: MediaQuery.of(context).size.width * 0.6,
-                onPressed: _handleSignIn,
-                darkMode: false,
-              ),
-              SizedBox(height: 20),
-              // Phone sign up button
-              Center(
-                child: InkWell(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => PhoneSignUpScreen()));
-                  },
-                  child: Container(
-                    // width: MediaQuery.of(context).size.width * 0.7,
-                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 15),
-                    margin: EdgeInsets.symmetric(horizontal: 72),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.phone),
-                        SizedBox(width: 10),
-                        Container(
-                          child: Text(
-                            'Sign in with phone number',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.w600),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: priColor,
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(100.0),
-                      topLeft: Radius.circular(100.0),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+}
+
+class SignInButton extends StatelessWidget {
+  const SignInButton({
+    super.key,
+    required this.imgLoc,
+    required this.title,
+  });
+  final String imgLoc;
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24.w),
+        color: Color(0xFF91C788),
+      ),
+      height: 63.h,
+      width: 290.w,
+      child: Row(
+        children: [
+          SizedBox(
+            width: 85.w,
+          ),
+          Image.asset(
+            imgLoc,
+            color: title == "Phone" ? Color.fromARGB(255, 11, 123, 214) : null,
+          ),
+          SizedBox(
+            width: 11.w,
+          ),
+          Text(
+            title,
+            style: GoogleFonts.signika(
+                fontSize: 20.sp,
+                fontWeight: FontWeight.w600,
+                color: Colors.white),
+          )
+        ],
       ),
     );
   }
@@ -244,7 +313,15 @@ class _PhoneSignUpScreenState extends State<PhoneSignUpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sign Up with Phone Number'),
+        title: Center(
+          child: Text(
+            'Sign Up with Phone Number',
+            style: GoogleFonts.signika(
+                fontSize: 17.sp,
+                color: Color(0xFF7c7c7c),
+                fontWeight: FontWeight.w500),
+          ),
+        ),
       ),
       body: Center(
         child: Column(
@@ -280,9 +357,9 @@ class _PhoneSignUpScreenState extends State<PhoneSignUpScreen> {
                 },
               ),
             ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () async {
+            SizedBox(height: 30.h),
+            ZoomTapAnimation(
+              onTap: () async {
                 showDialog(
                     context: context,
                     builder: (context) {
@@ -362,7 +439,7 @@ class _PhoneSignUpScreenState extends State<PhoneSignUpScreen> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  HomeScreen()));
+                                                  OnboardingView()));
                                     }).catchError((e) {
                                       showDialog(
                                           context: context,
@@ -390,13 +467,22 @@ class _PhoneSignUpScreenState extends State<PhoneSignUpScreen> {
                     // Auto-resolution timed out...
                   },
                 );
-                // Navigate to phone verification screen
-                // Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //         builder: (context) => PhoneVerificationScreen()));
               },
-              child: Text('Verify Phone Number'),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(24.w),
+                  color: Color(0xFF91C788),
+                ),
+                height: 63.h,
+                width: 290.w,
+                child: Center(
+                  child: Text("Verify Phone Number",
+                      style: GoogleFonts.signika(
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white)),
+                ),
+              ),
             ),
           ],
         ),

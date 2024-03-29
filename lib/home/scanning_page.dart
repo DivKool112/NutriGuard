@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:focused_area_ocr_flutter/focused_area_ocr_flutter.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:nurti_guard/const.dart';
+import 'package:nurti_guard/home/home_page.dart';
 
 import 'PersonaliseForum.dart';
 
@@ -29,6 +31,7 @@ class Result extends StatelessWidget {
 }
 
 class _ScanningPageState extends State<ScanningPage> {
+  final storage=GetStorage();
   final StreamController<String> controller = StreamController<String>();
   final double _textViewHeight = 80.0;
   TextEditingController _productNameController = TextEditingController();
@@ -54,7 +57,9 @@ class _ScanningPageState extends State<ScanningPage> {
 
     print(scannedText);
     if (scannedText.isNotEmpty) {
-      Navigator.push(
+   storage.read('isFormFilled') != null &&
+                storage.read('isFormFilled') == true
+            ? HomeScreenState().submitForm(''' ${scannedText})}''','ocr')  : Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) => PersonaliseForm(
