@@ -120,6 +120,12 @@ class HomeScreenState extends State<HomePage> {
 
   String finalPrompt = '';
   submitForm(String prompt, String sourcePage) async {
+    await storage.read('allergies') == ""
+        ? await storage.write('allergies', 'None')
+        : null;
+    await storage.read('medicalConditions') == ""
+        ? await storage.write('medicalConditions', 'None')
+        : null;
     print(prompt);
     Get.put(AiController()).productName = prompt;
     print('${Get.put(AiController()).productName}');
