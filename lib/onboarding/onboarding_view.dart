@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nurti_guard/home/bottom_nav.dart';
 import 'package:nurti_guard/home/home_page.dart';
@@ -16,6 +17,7 @@ class OnboardingView extends StatefulWidget {
 }
 
 class _OnboardingViewState extends State<OnboardingView> {
+  
   List<String> tipTitle = [
     'More Than 821 Million People',
     '2.8 Million Death EACH YEAR',
@@ -47,13 +49,20 @@ class _OnboardingViewState extends State<OnboardingView> {
 
   RxInt factIndex = Random().nextInt(7).obs;
   // RxInt factIndex = 5.obs;
+RxBool factShown=false.obs;
 
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    GetStorage().write('isOnboardingDone', true);
+  }
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
         future: showFacts(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+          if (snapshot.connectionState == ConnectionState.waiting && !factShown.value) {
             return Scaffold(
               body: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 42.w),
@@ -106,6 +115,7 @@ class _OnboardingViewState extends State<OnboardingView> {
               ),
             );
           } else {
+            factShown.value=true;
             return BottomNav();
           }
         });

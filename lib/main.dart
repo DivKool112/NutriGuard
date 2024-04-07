@@ -13,6 +13,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:nurti_guard/const.dart';
 import 'package:nurti_guard/firebase_options.dart';
+import 'package:nurti_guard/home/PersonaliseForum.dart';
 import 'package:nurti_guard/home/home_page.dart';
 import 'package:nurti_guard/onboarding/onboarding_view.dart';
 import 'package:openfoodfacts/openfoodfacts.dart';
@@ -78,7 +79,11 @@ class MyApp extends StatelessWidget {
                     colorScheme: ColorScheme.fromSeed(seedColor: priColor),
                     useMaterial3: true,
                     textTheme: GoogleFonts.oswaldTextTheme()),
-                home: const SplashScreen(),
+                //TODO
+                home: GetStorage().read('isOnboardingDone') != null &&
+                        GetStorage().read('isOnboardingDone')
+                    ? OnboardingView()
+                    : const SplashScreen(),
                 // home: OnboardingView(),
                 // home: BottomNav(),
               ),
@@ -102,6 +107,18 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    final storage = GetStorage();
+    if (storage.read('isFormFilled') != null &&
+        storage.read('isFormFilled') == true) {
+    } else {
+      storage.write('allergies', '');
+      storage.write('medicalConditions', '');
+      storage.write('selectedAgeGroup', '');
+      storage.write('language', '');
+      storage.write('dietaryPreference', '');
+      storage.write('gender', '');
+      storage.write('isPregnantOrLactating', false);
+    }
   }
 
   Future<void> _handleSignIn() async {
@@ -112,7 +129,11 @@ class _SplashScreenState extends State<SplashScreen> {
       var user = await firebaseAuth.signInWithProvider(GoogleAuthProvider());
       if (user.user?.emailVerified == true) {
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => OnboardingView()));
+            context,
+            MaterialPageRoute(
+                builder: (context) => PersonaliseForm(
+                      isEdit: false,
+                    )));
       } else {
         showDialog(
             context: context,
@@ -139,7 +160,8 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      // backgroundColor: Colors.white,
+      backgroundColor: Color(0xFF39e75f),
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -149,8 +171,8 @@ class _SplashScreenState extends State<SplashScreen> {
             Center(
               child: Text(
                 'Welcome To',
-                style: GoogleFonts.signika(
-                    fontSize: 24.sp, color: Color(0xFF848484)),
+                style:
+                    GoogleFonts.signika(fontSize: 24.sp, color: Colors.black),
               ),
             ),
             // SizedBox(
@@ -187,14 +209,16 @@ class _SplashScreenState extends State<SplashScreen> {
                 'Sign in to continue',
                 style: GoogleFonts.signika(
                     fontSize: 17.sp,
-                    color: Color(0xFF7c7c7c),
+                    // color: Color(0xFF7c7c7c),
+                    color: Colors.black,
                     fontWeight: FontWeight.w500),
               ),
             ),
             SizedBox(height: 43.h),
             ZoomTapAnimation(
               onTap: () {
-                Get.to(OnboardingView());
+                _handleSignIn();
+                // Get.to(OnboardingView());
               }, //_handleSignIn,
               child: SignInButton(
                 imgLoc: "assets/google_icon.png",
@@ -205,11 +229,11 @@ class _SplashScreenState extends State<SplashScreen> {
             SizedBox(height: 22.h),
             ZoomTapAnimation(
                 onTap: () {
-                  // Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //         builder: (context) => PhoneSignUpScreen()));
-                  Get.to(OnboardingView());
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => PhoneSignUpScreen()));
+                  // Get.to(OnboardingView());
                 },
                 child: SignInButton(
                     imgLoc: "assets/phone_icon.png", title: "Phone")),
@@ -312,6 +336,7 @@ class _PhoneSignUpScreenState extends State<PhoneSignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFF39e75f),
       appBar: AppBar(
         title: Center(
           child: Text(
@@ -439,7 +464,9 @@ class _PhoneSignUpScreenState extends State<PhoneSignUpScreen> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  OnboardingView()));
+                                                  PersonaliseForm(
+                                                    isEdit: false,
+                                                  )));
                                     }).catchError((e) {
                                       showDialog(
                                           context: context,

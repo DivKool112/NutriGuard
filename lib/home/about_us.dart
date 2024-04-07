@@ -48,6 +48,7 @@ class _AboutUsPageState extends State<AboutUsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Color(0xFF39e75f),
         automaticallyImplyLeading: false,
         // centerTitle: true,
         systemOverlayStyle: SystemUiOverlayStyle(
@@ -61,7 +62,7 @@ class _AboutUsPageState extends State<AboutUsPage> {
             )),
         centerTitle: true,
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: Color(0xFF39e75f),
       body: SizedBox(
         height: MediaQuery.of(context).size.height,
         child: ListView.builder(

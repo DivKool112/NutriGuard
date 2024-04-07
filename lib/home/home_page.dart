@@ -1,19 +1,26 @@
+// import 'dart:html';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:get/get_navigation/src/routes/default_transitions.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:nurti_guard/ai_analysis/ai_controller.dart';
 import 'package:nurti_guard/ai_analysis/ai_report.dart';
+import 'package:nurti_guard/common/widgets.dart';
 import 'package:nurti_guard/home/PersonaliseForum.dart';
 import 'package:nurti_guard/home/bottom_nav.dart';
 import 'package:nurti_guard/home/scanning_page.dart';
+import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 import '../api/api_barcode.dart';
@@ -39,16 +46,26 @@ class HomeScreenState extends State<HomePage> {
   int _numInterstitialLoadAttempts = 0;
   int maxFailedLoadAttempts = 3;
   void _showInterstitialAd() {
+    print('reached');
     if (_interstitialAd == null) {
       print('Warning: attempt to show interstitial before loaded.');
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => ReportPage(prompt: finalPrompt)),
-      );
-      // Get.to(ReportPage(prompt: finalPrompt));
+      // Navigator.push(
+      //   context,
+      // MaterialPageRoute(
+      //     builder: (context) => ReportPage(prompt: finalPrompt)),
+
+      // );
+      //  PersistentNavBarNavigator.pushNewScreen(
+      //     context,
+      //     screen: ReportPage(prompt: finalPrompt),
+      //     withNavBar: false, // OPTIONAL VALUE. True by default.
+      //     pageTransitionAnimation: PageTransitionAnimation.cupertino,
+      //   );
+
+      Get.to(ReportPage(prompt: finalPrompt));
       return;
     }
+
     _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
       onAdDismissedFullScreenContent: (InterstitialAd ad) {
         ad.dispose();
@@ -261,7 +278,7 @@ Furthermore, write about the cons and pros of the product by analyzing the infor
 
 Write the whole response for an app page where the information is presented to the user. Write in a descriptive and informative tone. 
 Also, give a personalized response based on the allergies and medical conditions inputted above. 
-Adding to it, if there is a con in the product and if any ingredient is not adequate, give the possible health hazard related to it. 
+Adding to it, if there is a con Fin the product and if any ingredient is not adequate, give the possible health hazard related to it. 
 
 Then, in a separate paragraph, give the information about the environmental aspect of the product like give the meaning to the ecoscore and nutriscore, describe what does the score stand for. 
 Also, use the carbon footprint to give a conclusion if the product is environmentally friendly or not. 
@@ -294,43 +311,41 @@ Use markdown in your response.Give your response in ${storage.read('language')} 
     'Your Food. Your Health. Our App'
   ];
   searchManually() async {
-    // showDialog(
-    //     context: context,
-    //     builder: (context) {
-    //       return AlertDialog(
-    //         title: Text('Searching...'),
-    //         content: SizedBox(
-    //             height: 100, child: Center(child: CircularProgressIndicator())),
-    //         actions: [
-    //           TextButton(
-    //             onPressed: () {
-    //               Navigator.pop(context);
-    //             },
-    //             child: Text('Cancel'),
-    //           )
-    //         ],
-    //       );
-    //     });
-    // prompt = await getProductDetailsByName(barController.text);
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Searching...'),
+            content: SizedBox(
+                height: 100, child: Center(child: CircularProgressIndicator())),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('Cancel'),
+              )
+            ],
+          );
+        });
+    // CommonWidgets.showToast("Searching Please Wait");
+    prompt = await getProductDetailsByName(barController.text);
     prompt = (barController.text);
 
     // Navigator.pop(context);
     //TODO
     try {
       if (prompt!.isNotEmpty) {
-        storage.read('isFormFilled') != null &&
-                storage.read('isFormFilled') == true
-            ? submitForm(prompt!, 'manual')
-            : Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => PersonaliseForm(
-                          prompt: prompt,
-                          sourcePage: 'manual',
-                        )));
+        submitForm(prompt!, 'manual');
       } else {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => ScanningPage()));
+        // Navigator.push(
+        //     context, MaterialPageRoute(builder: (context) => ScanningPage()));
+        PersistentNavBarNavigator.pushNewScreen(
+          context,
+          screen: ScanningPage(),
+          withNavBar: false, // OPTIONAL VALUE. True by default.
+          pageTransitionAnimation: PageTransitionAnimation.cupertino,
+        );
       }
     } catch (e) {
       print(e);
@@ -358,30 +373,22 @@ Use markdown in your response.Give your response in ${storage.read('language')} 
   void initState() {
     // TODO: implement initState
     super.initState();
-    final storage = GetStorage();
-    if (storage.read('isFormFilled') != null &&
-        storage.read('isFormFilled') == true) {
-    } else {
-      storage.write('allergies', '');
-      storage.write('medicalConditions', '');
-      storage.write('selectedAgeGroup', '');
-      storage.write('language', '');
-      storage.write('dietaryPreference', '');
-      storage.write('gender', '');
-      storage.write('isPregnantOrLactating', false);
-    }
+
     _createInterstitialAd();
   }
 
   String? prompt;
   TextEditingController barController = TextEditingController();
-
+  // var hi = MediaQuery.of(context).size.height;
+  // var wi = MediaQuery.of(context).size.width;
   @override
   Widget build(BuildContext context) {
-    var hi = MediaQuery.of(context).size.height;
-    var wi = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: Colors.white,
+      // backgroundColor: Color.fromARGB(255, 222, 222, 222),
+      // backgroundColor: Color(0xFFDDE9F7),
+      // backgroundColor: Color(0xFFE3EDF7),
+      // backgroundColor: Color.fromARGB(255, 165, 205, 176),
+      backgroundColor: Color(0xFF39e75f),
       // appBar: AppBar(
       //   backgroundColor: priColor,
       //   // title: Text(
@@ -398,8 +405,8 @@ Use markdown in your response.Give your response in ${storage.read('language')} 
       //   ),
       //   centerTitle: true,
       // ),
-      body: SafeArea(
-        child: SingleChildScrollView(
+      body: SingleChildScrollView(
+        child: SafeArea(
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 21.w),
             child: Column(
@@ -430,8 +437,9 @@ Use markdown in your response.Give your response in ${storage.read('language')} 
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             hintText: 'Search manually by product name',
-                            hintStyle:
-                                GoogleFonts.signika(color: Color(0xFF999999)),
+                            hintStyle: GoogleFonts.signika(
+                                color: Color(0xFF999999),
+                                fontWeight: FontWeight.bold),
                             // contentPadding:
                             //     EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                             // suffix: InkWell(
@@ -456,7 +464,7 @@ Use markdown in your response.Give your response in ${storage.read('language')} 
                   ),
                 ),
                 SizedBox(
-                  height: 29.h,
+                  height: 18.h,
                 ),
                 SizedBox(
                   width: 136.h,
@@ -481,17 +489,19 @@ Use markdown in your response.Give your response in ${storage.read('language')} 
                   ),
                 ),
                 SizedBox(
-                  height: 20.h,
+                  height: 8.h,
                 ),
                 Text(
                   "is here",
                   style: GoogleFonts.signika(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 24.sp,
-                      color: Color(0xFF8C8C8C)),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 24.sp,
+                    // color: Color(0xFF8C8C8C),
+                    color: Colors.black,
+                  ),
                 ),
                 SizedBox(
-                  height: 24.h,
+                  height: 18.h,
                 ),
                 Container(
                   decoration: BoxDecoration(
@@ -506,7 +516,7 @@ Use markdown in your response.Give your response in ${storage.read('language')} 
                         child: Text(
                           "Scan Barcodes directly here",
                           style: GoogleFonts.signika(
-                              fontWeight: FontWeight.w600, color: Colors.white),
+                              fontWeight: FontWeight.bold, color: Colors.white),
                         ),
                       ),
                       SizedBox(
@@ -517,69 +527,70 @@ Use markdown in your response.Give your response in ${storage.read('language')} 
                           String barcodeScanRes =
                               await FlutterBarcodeScanner.scanBarcode(
                                   "#ff6666", "Cancel", false, ScanMode.DEFAULT);
-                          showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  title: Text('Searching...'),
-                                  content: SizedBox(
-                                      height: 100,
-                                      child: Center(
-                                          child: SpinKitCircle(
-                                        color: Color(0xFF91C788),
-                                      ) //CircularProgressIndicator(),
-                                          )),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: Text('Cancel'),
-                                    )
-                                  ],
-                                );
-                              });
+                          // showDialog(
+                          //     context: context,
+                          //     builder: (context) {
+                          //       return AlertDialog(
+                          //         title: Text('Searching...'),
+                          //         content: SizedBox(
+                          //             height: 100,
+                          //             child: Center(
+                          //                 child: SpinKitCircle(
+                          //               color: Color(0xFF91C788),
+                          //             ) //CircularProgressIndicator(),
+                          //                 )),
+                          //         // actions: [
+                          //         //   TextButton(
+                          //         //     onPressed: () {
+                          //         //       Navigator.pop(context);
+                          //         //     },
+                          //         //     child: Text('Cancel'),
+                          //         //   )
+                          //         // ],
+                          //       );
+                          //     });
+                          CommonWidgets.showToast("Searching...");
                           if (barcodeScanRes != null) {
                             prompt = await getProductDetails(barcodeScanRes);
-                            Navigator.pop(context);
+                            // Navigator.pop(context);
                             // print(prompt);
                             try {
                               if (prompt!.isNotEmpty) {
-                                storage.read('isFormFilled') != null &&
-                                        storage.read('isFormFilled') == true
-                                    ? submitForm(prompt!, 'barcode')
-                                    : Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                PersonaliseForm(
-                                                  prompt: prompt,
-                                                  sourcePage: 'barcode',
-                                                )));
+                                submitForm(prompt!, 'barcode');
                               } else {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => ScanningPage()));
+                                // Navigator.push(
+                                //     context,
+                                //     MaterialPageRoute(
+                                //         builder: (context) => ScanningPage()));
+                                PersistentNavBarNavigator.pushNewScreen(
+                                  context,
+                                  screen: ScanningPage(),
+                                  withNavBar:
+                                      false, // OPTIONAL VALUE. True by default.
+                                  pageTransitionAnimation:
+                                      PageTransitionAnimation.cupertino,
+                                );
                               }
                             } catch (e) {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      title: Text('Error'),
-                                      content: Text(
-                                          'Product not found. Please try again.'),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: Text('OK'),
-                                        )
-                                      ],
-                                    );
-                                  });
+                              CommonWidgets.showToast(
+                                  "Product not found. Please try again");
+                              // showDialog(
+                              //     context: context,
+                              //     builder: (context) {
+                              //       return AlertDialog(
+                              //         title: Text('Error'),
+                              //         content: Text(
+                              //             'Product not found. Please try again.'),
+                              //         actions: [
+                              //           TextButton(
+                              //             onPressed: () {
+                              //               Navigator.pop(context);
+                              //             },
+                              //             child: Text('OK'),
+                              //           )
+                              //         ],
+                              //       );
+                              //     });
                             }
                           }
                         },
@@ -598,7 +609,7 @@ Use markdown in your response.Give your response in ${storage.read('language')} 
                               Text(
                                 "Scan Now",
                                 style: GoogleFonts.signika(
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeight.bold,
                                   fontSize: 12.sp,
                                   color: Color(0xFF9E9BC7),
                                 ),
@@ -630,26 +641,37 @@ Use markdown in your response.Give your response in ${storage.read('language')} 
                                 "Know about",
                                 style: GoogleFonts.signika(
                                     fontSize: 14.sp,
-                                    fontWeight: FontWeight.w600,
+                                    fontWeight: FontWeight.bold,
                                     color: Color(0xFFFF806E)),
                               ),
                               SizedBox(
                                 height: 8.h,
                               ),
                               SizedBox(
-                                  width: 125.w,
-                                  child: Text(
-                                      "The pros and cons of fast food by ingredients")),
+                                width: 125.w,
+                                child: Text(
+                                  "The pros and cons of fast food by ingredients",
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
                               SizedBox(
                                 height: 12.h,
                               ),
                               ZoomTapAnimation(
                                 onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              ScanningPage()));
+                                  // Navigator.push(
+                                  //     context,
+                                  //     MaterialPageRoute(
+                                  //         builder: (context) =>
+                                  //             ScanningPage()));
+                                  PersistentNavBarNavigator.pushNewScreen(
+                                    context,
+                                    screen: ScanningPage(),
+                                    withNavBar:
+                                        false, // OPTIONAL VALUE. True by default.
+                                    pageTransitionAnimation:
+                                        PageTransitionAnimation.cupertino,
+                                  );
                                 },
                                 child: Container(
                                   decoration: BoxDecoration(
@@ -669,7 +691,7 @@ Use markdown in your response.Give your response in ${storage.read('language')} 
                                       Text(
                                         "Scan Ingredients",
                                         style: GoogleFonts.signika(
-                                            fontWeight: FontWeight.w600,
+                                            fontWeight: FontWeight.bold,
                                             fontSize: 12.sp,
                                             color: Color(0xFF776565)),
                                       )
@@ -684,7 +706,7 @@ Use markdown in your response.Give your response in ${storage.read('language')} 
                   ),
                 ),
                 SizedBox(
-                  height: 27.h,
+                  height: 15.h,
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -703,7 +725,7 @@ Use markdown in your response.Give your response in ${storage.read('language')} 
                             Text(
                               "More About Us",
                               style: GoogleFonts.signika(
-                                  fontSize: 12.sp, fontWeight: FontWeight.w600),
+                                  fontSize: 12.sp, fontWeight: FontWeight.bold),
                             ),
                             ZoomTapAnimation(
                               onTap: () {
@@ -736,7 +758,7 @@ Use markdown in your response.Give your response in ${storage.read('language')} 
                                         "View",
                                         style: GoogleFonts.signika(
                                             fontSize: 12.sp,
-                                            fontWeight: FontWeight.w600),
+                                            fontWeight: FontWeight.bold),
                                       ),
                                       SizedBox(
                                         width: 13.w,
@@ -762,7 +784,7 @@ Use markdown in your response.Give your response in ${storage.read('language')} 
                             Text(
                               "Chat with AI",
                               style: GoogleFonts.signika(
-                                  fontSize: 12.sp, fontWeight: FontWeight.w600),
+                                  fontSize: 12.sp, fontWeight: FontWeight.bold),
                             ),
                             ZoomTapAnimation(
                               onTap: () {
@@ -795,7 +817,7 @@ Use markdown in your response.Give your response in ${storage.read('language')} 
                                         "Chat now",
                                         style: GoogleFonts.signika(
                                             fontSize: 12.sp,
-                                            fontWeight: FontWeight.w600),
+                                            fontWeight: FontWeight.bold),
                                       ),
                                       SizedBox(
                                         width: 6.w,
@@ -811,6 +833,28 @@ Use markdown in your response.Give your response in ${storage.read('language')} 
                     ],
                   ),
                 ),
+                SizedBox(
+                  height: 5.h,
+                ),
+                ZoomTapAnimation(
+                  onTap: () async {
+                    try {
+                      launchUrlString(
+                          "https://milaap.org/fundraisers/support-nutriguard?utm_source=whatsapp&utm_medium=fundraisers-title&mlp_referrer_id=9431386");
+                    } catch (e) {
+                      Get.defaultDialog(
+                          title: "Plrase Try Again After Sometime",
+                          middleText: "");
+                    }
+                  },
+                  child: Text(
+                    "Donate now to help spreading health and nutritional awareness",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: const Color.fromARGB(255, 0, 47, 85),
+                        decoration: TextDecoration.underline),
+                  ),
+                )
               ],
             ),
           ),

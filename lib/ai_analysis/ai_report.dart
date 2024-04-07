@@ -48,224 +48,245 @@ class _ChatPageState extends State<ReportPage> {
     print('start');
     print({messages.last['text']});
     print('over');
-    return Scaffold(
-      // backgroundColor: Color(0xfffff5d7),
-      backgroundColor: Color(0xFFB5B1E7),
-      appBar: AppBar(
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) {
+        Get.offAll(
+          () => BottomNav(),
+        );
+      },
+      child: Scaffold(
+        // backgroundColor: Color(0xfffff5d7),
         backgroundColor: Color(0xFFB5B1E7),
-        centerTitle: true,
-        // backgroundColor: priColor,
-        automaticallyImplyLeading: false,
-        leading: IconButton(
-          color: Colors.white,
-          onPressed: () {
-            PersistentNavBarNavigator.pushNewScreen(
-              context,
-              screen: HomePage(),
-              withNavBar: true, // OPTIONAL VALUE. True by default.
-              pageTransitionAnimation: PageTransitionAnimation.cupertino,
-            );
-            // sendMessage2();
-            // sendMessage3();
-          },
-          icon: Icon(
-            Icons.arrow_back,
+        appBar: AppBar(
+          backgroundColor: Color(0xFFB5B1E7),
+          centerTitle: true,
+          // backgroundColor: priColor,
+          automaticallyImplyLeading: false,
+          leading: IconButton(
+            color: Colors.white,
+            onPressed: () {
+              Get.offAll(
+                () => BottomNav(),
+              );
+              // PersistentNavBarNavigator.pushNewScreen(
+              //   context,
+              //   screen: HomePage(),
+              //   withNavBar: true, // OPTIONAL VALUE. True by default.
+              //   pageTransitionAnimation: PageTransitionAnimation.cupertino,
+              // );
+              // sendMessage2();
+              // sendMessage3();
+            },
+            icon: Icon(
+              Icons.arrow_back,
+            ),
           ),
+          systemOverlayStyle: SystemUiOverlayStyle(statusBarColor: priColor),
+          title: Text('Analysis Report',
+              style: GoogleFonts.signika(
+                  fontWeight: FontWeight.w400,
+                  fontSize: 18.sp,
+                  color: Colors.white)),
         ),
-        systemOverlayStyle: SystemUiOverlayStyle(statusBarColor: priColor),
-        title: Text('Analysis Report',
-            style: GoogleFonts.signika(
-                fontWeight: FontWeight.w400,
-                fontSize: 18.sp,
-                color: Colors.white)),
-      ),
-      body: isComp
-          ? Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  // begin: Alignment.topLeft,
-                  // end: Alignment.bottomRight,
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xFFB5B1E7),
+        body: isComp
+            ? Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    // begin: Alignment.topLeft,
+                    // end: Alignment.bottomRight,
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color(0xFFB5B1E7),
 
-                    Color(0xFFFFF8EB),
+                      Color(0xFFFFF8EB),
 
-                    // Color(0xFFF6AEA3),
-                    // Color(0xFF91c788),
+                      // Color(0xFFF6AEA3),
+                      // Color(0xFF91c788),
 
-                    Color(0xFF91C788),
-                    Colors.white,
+                      Color(0xFF91C788),
+                      Colors.white,
+                    ],
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 10.h,
+                    ),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.center,
+                    //   children: [
+                    //     GestureDetector(
+                    //       onTap: () {
+                    //         print("${Get.put(AiController()).productName}");
+                    //       },
+                    //       child: Text(
+                    //         "Nutriguard Rating : ",
+                    //         style: GoogleFonts.signika(
+                    //           fontSize: 24.sp,
+                    //           fontWeight: FontWeight.w500,
+                    //         ),
+                    //       ),
+                    //     ),
+                    //     Get.put(AiController()).rating == "0"
+                    //         ? Image.asset(
+                    //             "assets/sad_emoji.png",
+                    //             color: Colors.red,
+                    //           )
+                    //         : Get.put(AiController()).rating == "1"
+                    //             ? Image.asset(
+                    //                 "assets/moderate_emoji.png",
+                    //                 color: Colors.yellow.shade600,
+                    //               )
+                    //             : Get.put(AiController()).rating == "2"
+                    //                 ? Image.asset(
+                    //                     "assets/happy_emoji.png",
+                    //                     color: Colors.green.shade700,
+                    //                   )
+                    //                 : SizedBox(),
+                    //   ],
+                    // ),
+                    Text(
+                      "Nutrition composition on scale of 10",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.signika(
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20.h,
+                    ),
+                    PieChart(
+                      dataMap: Get.put(AiController()).dataMap,
+                      animationDuration: Duration(milliseconds: 800),
+                      chartLegendSpacing: 32,
+                      chartRadius: MediaQuery.of(context).size.width / 3.2,
+                      colorList: [
+                        Colors.orange,
+                        Colors.yellow,
+                        Colors.green,
+                        Colors.purple,
+                        Colors.red,
+                        Colors.blue,
+                      ],
+                      initialAngleInDegree: 0,
+                      chartType: ChartType.ring,
+                      ringStrokeWidth: 32,
+                      centerText: "Nutrients",
+                      legendOptions: LegendOptions(
+                        showLegendsInRow: false,
+                        legendPosition: LegendPosition.right,
+                        showLegends: true,
+                        // legendShape: _BoxShape.circle,
+                        legendTextStyle: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      chartValuesOptions: ChartValuesOptions(
+                        showChartValueBackground: true,
+                        showChartValues: true,
+                        showChartValuesInPercentage: false,
+                        showChartValuesOutside: false,
+                        decimalPlaces: 1,
+                      ),
+                      // gradientList: ---To add gradient colors---
+                      // emptyColorGradient: ---Empty Color gradient---
+                    ),
+                    SizedBox(
+                      height: 40.h,
+                    ),
+                    Expanded(
+                      child: Container(
+                          // height: 1.sh,
+                          child: Markdown(
+                        shrinkWrap: true,
+                        data: '${messages.last['text']}',
+                        styleSheet: MarkdownStyleSheet(
+                          h1: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey.shade600), //top
+                          h2: TextStyle(
+                            fontSize: 18.sp,
+                            color: Colors.black,
+                          ), //na
+                          h3: TextStyle(
+                              fontSize: 27, color: Color(0xff2a2836)), //na
+                          h4: TextStyle(
+                            fontSize: 18,
+                          ), //na
+                          h5: TextStyle(
+                            fontSize: 17,
+                          ), //na
+                          p: TextStyle(
+                            fontSize: 15.sp,
+                            color: Color(0xFF4D4B4B),
+                          ), //details
+                          blockquote: TextStyle(
+                            fontSize: 14,
+                          ),
+                          code: TextStyle(
+                            fontSize: 14,
+                          ),
+                          em: TextStyle(
+                            fontSize: 14,
+                          ),
+                          strong: TextStyle(
+                            fontSize: 16.sp,
+                            color: Colors.black,
+                          ), // para headings
+                        ),
+                      )),
+                    ),
                   ],
                 ),
-              ),
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 10.h,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          print("${Get.put(AiController()).productName}");
-                        },
-                        child: Text(
-                          "Nutriguard Rating : ",
-                          style: GoogleFonts.signika(
-                            fontSize: 24.sp,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                      Get.put(AiController()).rating == "0"
-                          ? Image.asset(
-                              "assets/sad_emoji.png",
-                              color: Colors.red,
-                            )
-                          : Get.put(AiController()).rating == "1"
-                              ? Image.asset(
-                                  "assets/moderate_emoji.png",
-                                  color: Colors.yellow.shade600,
-                                )
-                              : Get.put(AiController()).rating == "2"
-                                  ? Image.asset(
-                                      "assets/happy_emoji.png",
-                                      color: Colors.green.shade700,
-                                    )
-                                  : SizedBox(),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 20.h,
-                  ),
-                  PieChart(
-                    dataMap: Get.put(AiController()).dataMap,
-                    animationDuration: Duration(milliseconds: 800),
-                    chartLegendSpacing: 32,
-                    chartRadius: MediaQuery.of(context).size.width / 3.2,
-                    colorList: [
-                      Colors.red,
-                      Colors.blue,
-                      Colors.green,
-                      Colors.yellow
-                    ],
-                    initialAngleInDegree: 0,
-                    chartType: ChartType.ring,
-                    ringStrokeWidth: 32,
-                    centerText: "Nutrients",
-                    legendOptions: LegendOptions(
-                      showLegendsInRow: false,
-                      legendPosition: LegendPosition.right,
-                      showLegends: true,
-                      // legendShape: _BoxShape.circle,
-                      legendTextStyle: TextStyle(
-                        fontWeight: FontWeight.bold,
+              )
+            : isErr
+                ? Center(
+                    child: Text('Something went wrong! Please try again.'),
+                  )
+                : Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        // begin: Alignment.topLeft,
+                        // end: Alignment.bottomRight,
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color(0xFFB5B1E7),
+
+                          Color(0xFFFFF8EB),
+
+                          // Color(0xFFF6AEA3),
+                          // Color(0xFF91c788),
+
+                          Color(0xFF91C788),
+                          Colors.white,
+                        ],
                       ),
                     ),
-                    chartValuesOptions: ChartValuesOptions(
-                      showChartValueBackground: true,
-                      showChartValues: true,
-                      showChartValuesInPercentage: false,
-                      showChartValuesOutside: false,
-                      decimalPlaces: 1,
-                    ),
-                    // gradientList: ---To add gradient colors---
-                    // emptyColorGradient: ---Empty Color gradient---
-                  ),
-                  SizedBox(
-                    height: 40.h,
-                  ),
-                  Expanded(
-                    child: Container(
-                        // height: 1.sh,
-                        child: Markdown(
-                      shrinkWrap: true,
-                      data: '${messages.last['text']}',
-                      styleSheet: MarkdownStyleSheet(
-                        h1: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey.shade600), //top
-                        h2: TextStyle(
-                          fontSize: 18.sp,
-                          color: Colors.black,
-                        ), //na
-                        h3: TextStyle(
-                            fontSize: 27, color: Color(0xff2a2836)), //na
-                        h4: TextStyle(
-                          fontSize: 18,
-                        ), //na
-                        h5: TextStyle(
-                          fontSize: 17,
-                        ), //na
-                        p: TextStyle(
-                          fontSize: 15.sp,
-                          color: Color(0xFF4D4B4B),
-                        ), //details
-                        blockquote: TextStyle(
-                          fontSize: 14,
+                    height: MediaQuery.of(context).size.height,
+                    child: Center(
+                        child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Generating your report...',
                         ),
-                        code: TextStyle(
-                          fontSize: 14,
-                        ),
-                        em: TextStyle(
-                          fontSize: 14,
-                        ),
-                        strong: TextStyle(
-                          fontSize: 16.sp,
-                          color: Colors.black,
-                        ), // para headings
-                      ),
+                        SizedBox(height: 10),
+                        // CircularProgressIndicator(
+                        //   strokeCap: StrokeCap.round,
+                        // ),
+                        SpinKitCircle(
+                          color: Color(0xFF91C788),
+                        )
+                      ],
                     )),
                   ),
-                ],
-              ),
-            )
-          : isErr
-              ? Center(
-                  child: Text('Something went wrong! Please try again.'),
-                )
-              : Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      // begin: Alignment.topLeft,
-                      // end: Alignment.bottomRight,
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Color(0xFFB5B1E7),
-
-                        Color(0xFFFFF8EB),
-
-                        // Color(0xFFF6AEA3),
-                        // Color(0xFF91c788),
-
-                        Color(0xFF91C788),
-                        Colors.white,
-                      ],
-                    ),
-                  ),
-                  height: MediaQuery.of(context).size.height,
-                  child: Center(
-                      child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Generating your report...',
-                      ),
-                      SizedBox(height: 10),
-                      // CircularProgressIndicator(
-                      //   strokeCap: StrokeCap.round,
-                      // ),
-                      SpinKitCircle(
-                        color: Color(0xFF91C788),
-                      )
-                    ],
-                  )),
-                ),
+      ),
     );
   }
 

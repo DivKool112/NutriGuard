@@ -31,7 +31,7 @@ class Result extends StatelessWidget {
 }
 
 class _ScanningPageState extends State<ScanningPage> {
-  final storage=GetStorage();
+  final storage = GetStorage();
   final StreamController<String> controller = StreamController<String>();
   final double _textViewHeight = 80.0;
   TextEditingController _productNameController = TextEditingController();
@@ -57,15 +57,7 @@ class _ScanningPageState extends State<ScanningPage> {
 
     print(scannedText);
     if (scannedText.isNotEmpty) {
-   storage.read('isFormFilled') != null &&
-                storage.read('isFormFilled') == true
-            ? HomeScreenState().submitForm(''' ${scannedText})}''','ocr')  : Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => PersonaliseForm(
-                    prompt: ''' ${scannedText})}''',
-                    sourcePage: 'ocr',
-                  )));
+ HomeScreenState().submitForm(''' ${scannedText})}''', 'ocr');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('No text found'),

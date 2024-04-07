@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:nurti_guard/ai_chat/chat_ai.dart';
+import 'package:nurti_guard/home/profile_page.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'about_us.dart';
 import 'home_page.dart';
@@ -12,20 +16,17 @@ class BottomNav extends StatefulWidget {
   @override
   _BottomNavState createState() => _BottomNavState();
 }
-class BottomNavController extends GetxController{
-    PersistentTabController controller =
-      PersistentTabController(initialIndex: 0);
+
+class BottomNavController extends GetxController {
+  PersistentTabController controller = PersistentTabController(initialIndex: 0);
 }
 
 class _BottomNavState extends State<BottomNav> {
-
-  
   int _currentIndex = 0;
-
 
   // final List<Widget> _pages = [HomePage(), AboutUsPage(), ChatPage()];
   List<Widget> _buildScreens() {
-    return [HomePage(), AboutUsPage(), ChatPage()];
+    return [HomePage(), AboutUsPage(), ChatPage(), ProfilePage()];
   }
 
   List<PersistentBottomNavBarItem> _navBarsItems() {
@@ -54,6 +55,15 @@ class _BottomNavState extends State<BottomNav> {
           color: Color(0xFF91C788),
         ),
         title: ("Chat with AI"),
+        activeColorPrimary: Color(0xFF91C788),
+        // inactiveColorPrimary: Color(0xFF91C788),
+      ),
+      PersistentBottomNavBarItem(
+        icon: Icon(
+          CupertinoIcons.person_fill,
+          color: Color(0xFF91C788),
+        ),
+        title: ("Profile"),
         activeColorPrimary: Color(0xFF91C788),
         inactiveColorPrimary: Colors.white,
       ),
@@ -98,39 +108,69 @@ class _BottomNavState extends State<BottomNav> {
     //     ],
     //   ),
     // );
-    return PersistentTabView(
-      context,
-      controller: Get.put(BottomNavController()).controller,
-      screens: _buildScreens(),
-      items: _navBarsItems(),
-      confineInSafeArea: true,
-      backgroundColor: Colors
-          .white, // Color.fromARGB(255, 179, 223, 172), // Default is Colors.white.
-      handleAndroidBackButtonPress: true, // Default is true.
-      resizeToAvoidBottomInset:
-          true, // This needs to be true if you want to move up the screen when keyboard appears. Default is true.
-      stateManagement: true, // Default is true.
-      hideNavigationBarWhenKeyboardShows:
-          true, // Recommended to set 'resizeToAvoidBottomInset' as true while using this argument. Default is true.
-      decoration: NavBarDecoration(
-        borderRadius: BorderRadius.circular(10.0),
-        colorBehindNavBar: Colors.white,
+    return PopScope(
+      canPop: false,
+      onPopInvoked: ((didPop) {
+        Get.defaultDialog(
+            title: "",
+            content: Column(
+              children: [
+                Text("Exit App?"),
+                SizedBox(
+                  height: 30.h,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                        onPressed: () {
+                          exit(0);
+                        },
+                        child: Text("Yes")),
+                    ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text("No")),
+                  ],
+                )
+              ],
+            ));
+      }),
+      child: PersistentTabView(
+        context,
+        controller: Get.put(BottomNavController()).controller,
+        screens: _buildScreens(),
+        items: _navBarsItems(),
+        confineInSafeArea: true,
+        backgroundColor: Colors
+            .white, // Color.fromARGB(255, 179, 223, 172), // Default is Colors.white.
+        handleAndroidBackButtonPress: true, // Default is true.
+        resizeToAvoidBottomInset:
+            true, // This needs to be true if you want to move up the screen when keyboard appears. Default is true.
+        stateManagement: true, // Default is true.
+        hideNavigationBarWhenKeyboardShows:
+            true, // Recommended to set 'resizeToAvoidBottomInset' as true while using this argument. Default is true.
+        decoration: NavBarDecoration(
+          borderRadius: BorderRadius.circular(10.0),
+          colorBehindNavBar: Colors.white,
+        ),
+        popAllScreensOnTapOfSelectedTab: true,
+        popActionScreens: PopActionScreensType.all,
+        itemAnimationProperties: ItemAnimationProperties(
+          // Navigation Bar's items animation properties.
+          duration: Duration(milliseconds: 200),
+          curve: Curves.ease,
+        ),
+        screenTransitionAnimation: ScreenTransitionAnimation(
+          // Screen transition animation on change of selected tab.
+          animateTabTransition: true,
+          curve: Curves.ease,
+          duration: Duration(milliseconds: 200),
+        ),
+        navBarStyle:
+            NavBarStyle.style1, // Choose the nav bar style with this property.
       ),
-      popAllScreensOnTapOfSelectedTab: true,
-      popActionScreens: PopActionScreensType.all,
-      itemAnimationProperties: ItemAnimationProperties(
-        // Navigation Bar's items animation properties.
-        duration: Duration(milliseconds: 200),
-        curve: Curves.ease,
-      ),
-      screenTransitionAnimation: ScreenTransitionAnimation(
-        // Screen transition animation on change of selected tab.
-        animateTabTransition: true,
-        curve: Curves.ease,
-        duration: Duration(milliseconds: 200),
-      ),
-      navBarStyle:
-          NavBarStyle.style1, // Choose the nav bar style with this property.
     );
   }
 }

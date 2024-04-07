@@ -1,6 +1,8 @@
 import 'package:chat_bubbles/bubbles/bubble_normal.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:googleai_dart/googleai_dart.dart';
@@ -23,7 +25,7 @@ class _ChatPageState extends State<ChatPage> {
   final client = GoogleAIClient(
     apiKey: gK,
   );
-
+  FocusNode chatFocus = FocusNode();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,7 +45,8 @@ class _ChatPageState extends State<ChatPage> {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            Expanded(
+            SizedBox(
+              height: chatFocus.hasFocus ? 310.h : 565.h,
               child: ListView.builder(
                 itemCount: messages.length,
                 itemBuilder: (context, index) {
@@ -72,6 +75,7 @@ class _ChatPageState extends State<ChatPage> {
                   children: [
                     Expanded(
                       child: TextField(
+                        focusNode: chatFocus,
                         controller: _controller,
                         decoration: InputDecoration(
                             contentPadding:
