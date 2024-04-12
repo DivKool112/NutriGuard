@@ -1,4 +1,4 @@
-package com.example.nurti_guard
+package com.shreybajiya.nurti_guard
 
 import io.flutter.embedding.android.FlutterActivity
 
