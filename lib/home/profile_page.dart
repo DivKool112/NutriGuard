@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:nurti_guard/home/PersonaliseForum.dart';
 import 'package:nurti_guard/main.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -66,7 +67,9 @@ class ProfilePage extends StatelessWidget {
                 onTap: () {
                   PersistentNavBarNavigator.pushNewScreen(
                     context,
-                    screen: PersonaliseForm(isEdit: true,),
+                    screen: PersonaliseForm(
+                      isEdit: true,
+                    ),
                     withNavBar: false, // OPTIONAL VALUE. True by default.
                     pageTransitionAnimation: PageTransitionAnimation.cupertino,
                   );
@@ -102,6 +105,16 @@ class ProfilePage extends StatelessWidget {
                 height: 10.h,
               ),
               ZoomTapAnimation(
+                onTap: () async {
+                  try {
+                    launchUrlString(
+                        "https://www.freeprivacypolicy.com/live/7a5af80e-d3e0-4915-b632-d03b6f8f1fb0");
+                  } catch (e) {
+                    Get.defaultDialog(
+                        title: "Plrase Try Again After Sometime",
+                        middleText: "");
+                  }
+                },
                 child: Row(
                   children: [
                     Container(

@@ -533,28 +533,7 @@ Use markdown in your response.Give your response in ${storage.read('language')} 
                           String barcodeScanRes =
                               await FlutterBarcodeScanner.scanBarcode(
                                   "#ff6666", "Cancel", false, ScanMode.DEFAULT);
-                          // showDialog(
-                          //     context: context,
-                          //     builder: (context) {
-                          //       return AlertDialog(
-                          //         title: Text('Searching...'),
-                          //         content: SizedBox(
-                          //             height: 100,
-                          //             child: Center(
-                          //                 child: SpinKitCircle(
-                          //               color: Color(0xFF91C788),
-                          //             ) //CircularProgressIndicator(),
-                          //                 )),
-                          //         // actions: [
-                          //         //   TextButton(
-                          //         //     onPressed: () {
-                          //         //       Navigator.pop(context);
-                          //         //     },
-                          //         //     child: Text('Cancel'),
-                          //         //   )
-                          //         // ],
-                          //       );
-                          //     });
+
                           CommonWidgets.showToast("Searching...");
                           if (barcodeScanRes != null) {
                             prompt = await getProductDetails(barcodeScanRes);
@@ -564,15 +543,10 @@ Use markdown in your response.Give your response in ${storage.read('language')} 
                               if (prompt!.isNotEmpty) {
                                 submitForm(prompt!, 'barcode');
                               } else {
-                                // Navigator.push(
-                                //     context,
-                                //     MaterialPageRoute(
-                                //         builder: (context) => ScanningPage()));
                                 PersistentNavBarNavigator.pushNewScreen(
                                   context,
                                   screen: ScanningPage(),
-                                  withNavBar:
-                                      false, // OPTIONAL VALUE. True by default.
+                                  withNavBar: false,
                                   pageTransitionAnimation:
                                       PageTransitionAnimation.cupertino,
                                 );
@@ -580,23 +554,6 @@ Use markdown in your response.Give your response in ${storage.read('language')} 
                             } catch (e) {
                               CommonWidgets.showToast(
                                   "Product not found. Please try again");
-                              // showDialog(
-                              //     context: context,
-                              //     builder: (context) {
-                              //       return AlertDialog(
-                              //         title: Text('Error'),
-                              //         content: Text(
-                              //             'Product not found. Please try again.'),
-                              //         actions: [
-                              //           TextButton(
-                              //             onPressed: () {
-                              //               Navigator.pop(context);
-                              //             },
-                              //             child: Text('OK'),
-                              //           )
-                              //         ],
-                              //       );
-                              //     });
                             }
                           }
                         },
@@ -840,27 +797,86 @@ Use markdown in your response.Give your response in ${storage.read('language')} 
                   ),
                 ),
                 SizedBox(
-                  height: 5.h,
+                  height: 15.h,
                 ),
-                ZoomTapAnimation(
-                  onTap: () async {
-                    try {
-                      launchUrlString(
-                          "https://milaap.org/fundraisers/support-nutriguard?utm_source=whatsapp&utm_medium=fundraisers-title&mlp_referrer_id=9431386");
-                    } catch (e) {
-                      Get.defaultDialog(
-                          title: "Plrase Try Again After Sometime",
-                          middleText: "");
-                    }
-                  },
-                  child: Text(
-                    "Donate now to help spreading health and nutritional awareness",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: const Color.fromARGB(255, 0, 47, 85),
-                        decoration: TextDecoration.underline),
+                Container(
+                  decoration: BoxDecoration(
+                      color: Color(0xFF9E9BC7),
+                      borderRadius: BorderRadius.circular(32.w)),
+                  child: Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 32.w, vertical: 20.h),
+                    child: Row(children: [
+                      SizedBox(
+                        width: 138.w,
+                        child: Text(
+                          "Donate now to help spreading health and nutritional awareness",
+                          style: GoogleFonts.signika(
+                              fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 20.w,
+                      ),
+                      ZoomTapAnimation(
+                        onTap: () async {
+                          try {
+                            launchUrlString(
+                                "https://milaap.org/fundraisers/support-nutriguard?utm_source=whatsapp&utm_medium=fundraisers-title&mlp_referrer_id=9431386");
+                          } catch (e) {
+                            Get.defaultDialog(
+                                title: "Plrase Try Again After Sometime",
+                                middleText: "");
+                          }
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8.w),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.all(8.w),
+                            child: Row(children: [
+                              Image.asset("assets/qr_icon.png"),
+                              SizedBox(
+                                width: 8.w,
+                              ),
+                              Text(
+                                "Donate now",
+                                style: GoogleFonts.signika(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12.sp,
+                                  color: Color(0xFF9E9BC7),
+                                ),
+                              )
+                            ]),
+                          ),
+                        ),
+                      ),
+                    ]),
                   ),
-                )
+                ),
+
+                // ZoomTapAnimation(
+                //   onTap: () async {
+                //     try {
+                //       launchUrlString(
+                //           "https://milaap.org/fundraisers/support-nutriguard?utm_source=whatsapp&utm_medium=fundraisers-title&mlp_referrer_id=9431386");
+                //     } catch (e) {
+                //       Get.defaultDialog(
+                //           title: "Plrase Try Again After Sometime",
+                //           middleText: "");
+                //     }
+                //   },
+                //   child: Text(
+                //     "Donate now to help spreading health and nutritional awareness",
+                //     textAlign: TextAlign.center,
+                //     style: TextStyle(
+                //         color: const Color.fromARGB(255, 0, 47, 85),
+                //         decoration: TextDecoration.underline),
+                //   ),
+                // ),
+                SizedBox(height: 80.h),
               ],
             ),
           ),
